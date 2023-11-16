@@ -191,6 +191,7 @@ module.exports = function(app) {
         }
         res.send({'data': data && data.length ? data : null})
     })
+
     // SUB
     app.post('/syncs/countries_from_central', async (req, res, next) => {
         var sync_logs = {}
