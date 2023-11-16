@@ -490,7 +490,7 @@ module.exports = function(app) {
                             const data = new FormData();
                             data.append('file', fs.createReadStream(config.uploadDir+value));
                             try {
-                                const upload = await axios.post(config.centralUrl+'upload_sync', data, { headers: { 'attachments': value,  'accept': 'application/json', 'Accept-Language': 'en-US,en;q=0.8','Content-Type': `multipart/form-data; boundary=${data._boundary}`,}})  
+                                const upload = await axios.post(config.centralUrl+'upload_sync_from_sub', data, { headers: { 'attachments': value,  'accept': 'application/json', 'Accept-Language': 'en-US,en;q=0.8','Content-Type': `multipart/form-data; boundary=${data._boundary}`,}})  
                             } catch (error) {
                                 //  
                             }          
