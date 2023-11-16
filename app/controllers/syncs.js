@@ -17,6 +17,8 @@ const deletedVisasSyncModel = require('../models/deletedVisasSyncModel');
 const fs = require('fs')
 const config = require('../config/config')
 const axios = require('axios')
+const FormData = require('form-data');
+
 
 
 module.exports = function(app) {
@@ -250,9 +252,7 @@ module.exports = function(app) {
 
     // SUB SERVER CALL
     app.post('/syncs/activity_logs_to_central', async (req, res) => {
-        const data = await activityLogModel.getActivitySync({select: 'a.*, bin_to_uuid(a.id) as id, bin_to_uuid(a.uid) as uid, bin_to_uuid(a.record_id) as record_id', filters: {'sid': '0'}})
-        console.log(data)
-        
+        const data = await activityLogModel.getActivitySync({select: 'a.*, bin_to_uuid(a.id) as id, bin_to_uuid(a.uid) as uid, bin_to_uuid(a.record_id) as record_id', filters: {'sid': '0'}})        
         try {
             const result = await axios.post(config.centralUrl+'syncs/activity_logs_from_sub', { 'data': data })
             if(result && result.status==200){
@@ -372,7 +372,6 @@ module.exports = function(app) {
         const data = await visaModel.getVisaSync({select: 'v.*, bin_to_uuid(v.vid) as vid, bin_to_uuid(v.uid) as uid',  filters: {'sid': '0'}})           
        
        
-        console.log(data)
         
         
         if(data && data.length ){
@@ -385,6 +384,7 @@ module.exports = function(app) {
                         for (const [key, value] of Object.entries(attFiles)) {
                             const data = new FormData();
                             data.append('file', fs.createReadStream(config.uploadDir+value));
+                            console.log('data', data)
                             try {
                                 const upload = await axios.post(config.centralUrl+'upload_sync', data, { headers: { 'attachments': value,  'accept': 'application/json', 'Accept-Language': 'en-US,en;q=0.8','Content-Type': `multipart/form-data; boundary=${data._boundary}`,}})  
                             } catch (error) {
@@ -437,7 +437,10 @@ module.exports = function(app) {
     // SUB SERVER CALL
     app.post('/syncs/printed_visas_to_central', async (req, res) => {
         const data = await printedVisasModel.getVisasSync({select: 'pv.*, bin_to_uuid(pv.id) as id, bin_to_uuid(pv.vid) as vid, bin_to_uuid(pv.uid) as uid',  filters: {'sid': '0'}})           
-        try {
+        
+        
+        if(data && data.length ){
+            try {
             const result = await axios.post(config.centralUrl+'syncs/printed_visas_from_sub', { 'data': data })
             if(result && result.status==200){
                 await printedVisasSyncModel.delete()
@@ -445,7 +448,7 @@ module.exports = function(app) {
             }
         } catch (error) {
             // console.log('sync error')
-        }
+        }}
         return res.status(200).send({'message': 'Nothing update'})
     })
 
