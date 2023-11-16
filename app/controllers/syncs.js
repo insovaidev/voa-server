@@ -265,8 +265,6 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothing update'})
     })
 
-
-
     // Checklists
     // CENTRAL
     app.post('/syncs/checklists_from_sub', async (req, res) => {
@@ -372,6 +370,11 @@ module.exports = function(app) {
     // SUB SERVER CALL
     app.post('/syncs/visas_to_central', async (req, res, next) => {
         const data = await visaModel.getVisaSync({select: 'v.*, bin_to_uuid(v.vid) as vid, bin_to_uuid(v.uid) as uid',  filters: {'sid': '0'}})           
+       
+       
+        console.log(data)
+        
+        
         if(data && data.length ){
             // Upload To Central
             data.forEach(async val => {
@@ -446,10 +449,6 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothing update'})
     })
 
-
-
-
-
     // Visas Deleted
     // CENTRAL 
     app.post('/syncs/deleted_visas_from_sub', async (req, res) => {
@@ -479,11 +478,6 @@ module.exports = function(app) {
     // SUB SERVER CALL
     app.post('/syncs/deleted_visas_to_central', async (req, res) => {
         const data = await deletedVisasModel.getVisasSync({select: 'dv.*, bin_to_uuid(dv.id) as id, bin_to_uuid(dv.vid) as vid, bin_to_uuid(dv.uid) as uid',  filters: {'sid': '0'}})        
-       
-    //    console.log(data)
-    //    return 
-
-
         if(data && data.length ){   
             // Upload To Central
             data.forEach(async val => {
