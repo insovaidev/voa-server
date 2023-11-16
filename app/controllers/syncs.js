@@ -103,6 +103,7 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothing is update'})
     })
 
+
     // VOA
     app.post('/syncs/ports_to_sub', async (req, res) => {
         var data = []
@@ -113,6 +114,7 @@ module.exports = function(app) {
         res.send({'data': data && data.length ? data : null})
     })
 
+    // SUB
     app.post('/syncs/ports_from_central', async (req, res, next) => {
         var sync_logs = {}
         let request = null;
@@ -134,7 +136,6 @@ module.exports = function(app) {
                     }
                 }
             }
-
             sync_logs.ports = sid
             fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
             res.send({'id':sid})
@@ -145,9 +146,8 @@ module.exports = function(app) {
 
 
 
-
-
-    app.post('/syncs/visa_types', async (req, res) => {
+    // VOA
+    app.post('/syncs/visa_types_to_sub', async (req, res) => {
         var data = []
         if(req.body.sid != undefined) {
           var sid = req.body.sid
@@ -155,6 +155,55 @@ module.exports = function(app) {
         }
         res.send({'data': data && data.length ? data : null})
     })
+
+    // SUB
+    app.post('/syncs/visa_types_from_central', async (req, res, next) => {
+        var sync_logs = {}
+        var request = null
+        if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
+        var sid = sync_logs.visa_types != undefined ? sync_logs.visa_types : 0 
+        try {
+            request = await axios.post(config.centralUrl+'syncs/visa_types_to_sub', {'sid': parseInt(sid)})    
+            if(request.data != null && request.data.data) {
+                for(var i in request.data.data) {
+                    var val = request.data.data[i]
+                    // check record
+                    if(sid<=val.sid) sid = val.sid
+                    delete val.sid
+                    const visaType = await visaTypeModel.getOne({select: '*', filters: {'id': val.id}})
+                    if(visaType) {
+                        await visaTypeModel.updateSync(request.data.data[i])
+                    } else {
+                        await visaTypeModel.addSync(request.data.data[i])
+                    }
+                }
+            }
+            sync_logs.visa_types = sid
+            fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
+            res.send({'id':sid})
+                
+        } catch (error) {
+            next() 
+        }
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     app.post('/syncs/countries', async (req, res) => {
         var data = []

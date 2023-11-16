@@ -76,4 +76,20 @@ module.exports = {
         const result = await q;
         return result && result[0] && result.length ? result[0] : null
     }, 
+
+    addSync: async function(data){
+        const body = generalLib.omit(data, 'id')
+        body.created_at = generalLib.formatDateTime(data.created_at)
+        body.updated_at = generalLib.formatDateTime(data.updated_at)
+        const result  = await db(table).insert({id: db.raw('uuid_to_bin("'+data.id+'")'),...body})
+        return result[0]       
+    },
+
+    updateSync: async function(data){
+        const body = generalLib.omit(data, 'id')        
+        body.created_at = generalLib.formatDateTime(data.created_at)
+        body.updated_at = generalLib.formatDateTime(data.updated_at)
+        const result = await db(table).update(body).whereRaw('id = uuid_to_bin('+"'"+data.id+"'"+')')
+        return result == 1    
+    },
 }
