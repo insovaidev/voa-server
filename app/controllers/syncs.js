@@ -15,7 +15,7 @@ const axios = require('axios')
 
 module.exports = function(app) {
 
-    // VOA SUB
+    // SUB
     app.post('/syncs/users_from_central', async (req, res, next) => {        
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
@@ -56,32 +56,34 @@ module.exports = function(app) {
         res.send({'data': data && data.length ? data : null})
     })
 
-    
+
+    // SUB 
+    app.post('/syncs/users_profile_to_central', async (req, res) => {
+        var sync_logs = {}
+        if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
+        var sid = sync_logs.profile != undefined ? sync_logs.profile : 0       
+        const data = await userModel.getUserSync({select: 'bin_to_uuid(u.uid) as uid, u.password, u.phone, u.sex, u.name, u.email, u.updated_at, s.sid' , filters: {'sid': sid}})     
+        if(data){
+            const lastSid = data[0].sid
+            try {
+                const result = await axios.post(config.centralUrl+'users_profile_from_sub', { 'data': data })
+                if(result && result.status==200){
+                    sync_logs.profile = lastSid
+                    fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
+                    return res.send({'message': 'sync success'})
+                }
+            } catch (error) {
+                // console.log('sync error')
+            }
+
+        }
+        return res.status(200).send({'message': 'Nothing update'})
+    })
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    app.post('/syncs/profile', async (req, res) => {
+    // VOA 
+    app.post('/syncs/users_profile_from_sub', async (req, res) => {
         const body = req.body
         if(body != null && body.data){
             try {
@@ -99,6 +101,34 @@ module.exports = function(app) {
         }
         return res.status(200).send({'message': 'Nothing is update'})
     })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
     app.post('/syncs/ports', async (req, res) => {
         var data = []
