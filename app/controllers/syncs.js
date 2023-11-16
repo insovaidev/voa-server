@@ -199,19 +199,20 @@ module.exports = function(app) {
         var sid = sync_logs.countries != undefined ? sync_logs.countries : 0
 
         console.log(sid)
+        
 
 
         try {
             const request = await axios.post(config.centralUrl+'syncs/countries_to_sub', {'sid': parseInt(sid)})    
             
-            
-            
-            
             if(request.data != null && request.data.data) {
                 // console.log('request', request)
                 for(var i in request.data.data) {
                     var val = request.data.data[i]
-                    // console.log('val', val)
+
+                    // console.log(val)
+                    
+                    
                     if(sid<=val.sid) sid = val.sid
                     delete val.sid
                     const country = await countryModel.getOne({select: '*', filters: {'id': val.id}})
@@ -232,9 +233,6 @@ module.exports = function(app) {
         }
         
     })
-
-
-
 
 
 
@@ -370,24 +368,6 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothing is update'})
     })
 
-    app.post('/syncs/profile', async (req, res) => {
-        const body = req.body
-        if(body != null && body.data){
-            try {
-                for( i in body.data){
-                    const val = body.data[i]
-                    const result = await userModel.getOne({select: 'bin_to_uuid(uid) as uid', filters: {'uid': val.uid}})     
-                    if(result){
-                        await userModel.updateSync(val.uid, val, 'uid')
-                    } 
-                }
-                return res.status(200).send({'message': 'sync success'})    
-            } catch (error) {
-             // console.log('error')
-             return res.status(422).send({'message': error.message })   
-            }
-        }
-        return res.status(200).send({'message': 'Nothing is update'})
-    })
+   
 
 }
