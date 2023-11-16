@@ -22,26 +22,22 @@ module.exports = function(app) {
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.users != undefined ? sync_logs.users : 0  
-        console.log('call')
     
     try {    
         request = await axios.post(config.centralUrl+'syncs/users_to_sub', {'sid': parseInt(sid)})    
-        
-        return 
-
         if(request && request.data != null && request.data.data) {
-                // for(var i in request.data.data) {
-                //     var val = request.data.data[i]
-                //     // check record
-                //     if(sid<=val.sid) sid = val.sid
-                //     delete val.sid
-                //     const user = await userModel.get({select: '*', filters: {'uid': val.uid}})
-                //     if(user) {
-                //         await userModel.updateSync(request.data.data[i])
-                //     } else {
-                //         await userModel.addSync(request.data.data[i])
-                //     }
-                // }
+                for(var i in request.data.data) {
+                    var val = request.data.data[i]
+                    // check record
+                    if(sid<=val.sid) sid = val.sid
+                    delete val.sid
+                    const user = await userModel.get({select: '*', filters: {'uid': val.uid}})
+                    if(user) {
+                        await userModel.updateSync(request.data.data[i])
+                    } else {
+                        await userModel.addSync(request.data.data[i])
+                    }
+                }
             }
             sync_logs.users = sid
             fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
