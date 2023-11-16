@@ -197,10 +197,13 @@ module.exports = function(app) {
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.countries != undefined ? sync_logs.countries : 0
-        var request = null;
-
         try {
-            request = await axios.post(config.centralUrl+'syncs/countries_to_sub', {'sid': parseInt(sid)})    
+            const request = await axios.post(config.centralUrl+'syncs/countries_to_sub', {'sid': parseInt(sid)})    
+            
+            console.log('request', request)
+
+
+            
             if(request.data != null && request.data.data) {
                 for(var i in request.data.data) {
                     var val = request.data.data[i]
