@@ -44,8 +44,6 @@ module.exports = function(app) {
             // res.status(201).send({'message': 'CONFUSE SERVER'})
         }
     })
-
-
     // VOA
     app.post('/syncs/users_to_sub', async (req, res) => {
         var data = []
@@ -81,8 +79,6 @@ module.exports = function(app) {
         }
         return res.status(200).send({'message': 'Nothing update'})
     })
-
-
     // VOA 
     app.post('/syncs/users_profile_from_sub', async (req, res) => {
         const body = req.body
@@ -113,7 +109,6 @@ module.exports = function(app) {
         }
         res.send({'data': data && data.length ? data : null})
     })
-
     // SUB
     app.post('/syncs/ports_from_central', async (req, res, next) => {
         var sync_logs = {}
@@ -155,7 +150,6 @@ module.exports = function(app) {
         }
         res.send({'data': data && data.length ? data : null})
     })
-
     // SUB
     app.post('/syncs/visa_types_from_central', async (req, res, next) => {
         var sync_logs = {}
@@ -188,24 +182,8 @@ module.exports = function(app) {
     })
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    app.post('/syncs/countries', async (req, res) => {
+    // VOA
+    app.post('/syncs/countries_to_sub', async (req, res) => {
         var data = []
         if(req.body.sid != undefined) {
           var sid = req.body.sid
@@ -213,6 +191,44 @@ module.exports = function(app) {
         }
         res.send({'data': data && data.length ? data : null})
     })
+    // SUB
+    app.post('/syncs/countries_from_central', async (req, res, next) => {
+        var sync_logs = {}
+        if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
+        var sid = sync_logs.countries != undefined ? sync_logs.countries : 0
+        var request = null;
+
+        try {
+            request = await axios.post(config.centralUrl+'syncs/countries_to_sub', {'sid': parseInt(sid)})    
+            if(request.data != null && request.data.data) {
+                for(var i in request.data.data) {
+                    var val = request.data.data[i]
+                    if(sid<=val.sid) sid = val.sid
+                    delete val.sid
+                    const country = await countryModel.getOne({select: '*', filters: {'id': val.id}})
+                    if(country) {
+                        await countryModel.updateSync(request.data.data[i])
+                    } else {
+                        await countryModel.addSync(request.data.data[i])
+                    }
+                }
+            }
+
+            sync_logs.countries = sid
+            fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
+            res.send({'id':sid})
+            
+        } catch (error) {
+            next()
+        }
+        
+    })
+
+
+
+
+
+
 
     app.post('/syncs/activity_logs', async (req, res) => {
         const body = req.body
