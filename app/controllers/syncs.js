@@ -15,6 +15,7 @@ const axios = require('axios')
 
 module.exports = function(app) {
 
+    // VOA SUB
     // Sync Users
     app.post('/syncs/users_from_central', async (req, res, next) => {        
         let request = null;
@@ -22,16 +23,10 @@ module.exports = function(app) {
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.users != undefined ? sync_logs.users : 0  
     
-    try {
-        
-        request = await axios.post(config.centralUrl+'syncs/users_to_local', {'sid': parseInt(sid)})
-        
-        console.log(request)
-        
-        
+    try {    
+        request = await axios.post(config.centralUrl+'syncs/users_to_local', {'sid': parseInt(sid)})    
         return 
         
-    
         if(request && request.data != null && request.data.data) {
                 // for(var i in request.data.data) {
                 //     var val = request.data.data[i]
@@ -55,8 +50,9 @@ module.exports = function(app) {
         }
     })
 
-    
-    app.post('/syncs/users', async (req, res) => {
+
+    // VOA
+    app.post('/syncs/users_to_sub', async (req, res) => {
         var data = []
         if(req.body.sid != undefined) {
           var sid = req.body.sid
@@ -64,6 +60,8 @@ module.exports = function(app) {
         }
         res.send({'data': data && data.length ? data : null})
     })
+
+    
 
     app.post('/syncs/profile', async (req, res) => {
         const body = req.body
