@@ -66,7 +66,7 @@ module.exports = function(app) {
         if(data){
             const lastSid = data[0].sid
             try {
-                const result = await axios.post(config.centralUrl+'users_profile_from_sub', { 'data': data })
+                const result = await axios.post(config.centralUrl+'syncs/users_profile_from_sub', { 'data': data })
                 if(result && result.status==200){
                     sync_logs.profile = lastSid
                     fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
