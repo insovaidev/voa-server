@@ -10,6 +10,7 @@ const visaModel = require('../models/visaModel');
 const visaTypeModel = require("../models/visaTypeModel");
 const countryModel = require("../models/countryModel");
 const deviceModel = require('../models/deviceModel')
+const userSyncModel = require('../models/userSyncModel')
 
 
 module.exports = function (app) {
