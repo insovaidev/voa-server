@@ -8,6 +8,7 @@ const passportModel = require('../models/passportModel')
 const checklistModel = require("../models/checklistModel")
 const printedVisasModel = require('../models/printedVisasModel')
 const deletedVisasModel = require('../models/deletedVisasModel')
+const activityLogSyncModel = require('../models/activityLogSyncModel')
 const fs = require('fs')
 const config = require('../config/config')
 const axios = require('axios')
@@ -246,6 +247,8 @@ module.exports = function(app) {
     // SUB
     app.post('/syncs/activity_logs_to_central', async (req, res) => {
         const data = await activityLogModel.getActivitySync({select: 'a.*, bin_to_uuid(a.id) as id, bin_to_uuid(a.uid) as uid, bin_to_uuid(a.record_id) as record_id', filters: {'sid': '0'}})
+        console.log(data)
+        
         try {
             const result = await axios.post(config.centralUrl+'syncs/activity_logs_from_sub', { 'data': data })
             if(result && result.status==200){
