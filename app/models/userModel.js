@@ -157,6 +157,27 @@ module.exports = {
         const result = await db(table).update(body).whereRaw('uid = uuid_to_bin('+"'"+data.uid+"'"+')')
         return result == 1    
     },
+
+    getUserSync: async function({select=null, filters=null}={}){
+        const q = db(table+' as u')
+        // Select
+        q.select()
+        if(select) q.select(db.raw(select))
+        
+        // Join
+        q.join(db.raw('users_sync'+' as s on u.uid=s.id'))
+        
+        // Sort
+        q.orderBy('s.sid', 'desc')
+ 
+        // Where condition
+        if(filters){
+            if(filters.sid) q.where('s.sid', '>', parseInt(filters.sid))
+        }
+        // Return data
+        const result = await q
+        return result && result.length ? result : null
+    },
     
 }
 
