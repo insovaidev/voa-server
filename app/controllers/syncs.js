@@ -63,6 +63,9 @@ module.exports = function(app) {
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.profile != undefined ? sync_logs.profile : 0       
         const data = await userModel.getUserSync({select: 'bin_to_uuid(u.uid) as uid, u.password, u.phone, u.sex, u.name, u.email, u.updated_at, s.sid' , filters: {'sid': sid}})     
+        
+        console.log(data)
+        
         if(data){
             const lastSid = data[0].sid
             try {

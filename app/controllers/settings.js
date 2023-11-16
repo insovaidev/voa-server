@@ -395,7 +395,7 @@ module.exports = function (app) {
             } 
             updateData.username=data.username
         }
-
+        
         if(data){
             if(('email' in data)){
                 if(data.email !== ""){
@@ -413,7 +413,7 @@ module.exports = function (app) {
             } 
             if(data.name) updateData.name=data.name
             if(data.sex) updateData.sex=data.sex
-        }    
+        }
         
         if(data.old_password && data.password){
             const user = await userModel.get({select:'password', filters: { uid: me.id }})
@@ -433,6 +433,14 @@ module.exports = function (app) {
                 data_json.updated_at = generalLib.formatDateTime(data_json.updated_at)
                 data_json.logout_at = generalLib.formatDateTime(data_json.logout_at)
                 if(!me.port) device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
+
+                // add user_sync record
+                await userSyncModel.add({
+                    'id': user.uid,
+                    'status': 1,
+                    'created_at': generalLib.formatDateTime(user.created_at),
+                    'updated_at': generalLib.formatDateTime(user.updated_at),
+                })
 
                 await activityLogModel.add({
                     id: generalLib.generateUUID(me.port),
