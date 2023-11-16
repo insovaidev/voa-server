@@ -83,7 +83,6 @@ module.exports = function(app) {
     })
 
 
-
     // VOA 
     app.post('/syncs/users_profile_from_sub', async (req, res) => {
         const body = req.body
@@ -104,35 +103,8 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothing is update'})
     })
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    app.post('/syncs/ports', async (req, res) => {
+    // VOA
+    app.post('/syncs/ports_to_sub', async (req, res) => {
         var data = []
         if(req.body.sid != undefined) {
           var sid = req.body.sid
@@ -140,6 +112,40 @@ module.exports = function(app) {
         }
         res.send({'data': data && data.length ? data : null})
     })
+
+    app.post('/syncs/ports_from_central', async (req, res, next) => {
+        var sync_logs = {}
+        let request = null;
+        if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
+        var sid = sync_logs.ports != undefined ? sync_logs.ports : 0 
+        try {
+            request = await axios.post(config.centralUrl+'syncs/ports_to_sub', {'sid': parseInt(sid)})    
+            if(request.data != null && request.data.data) {
+                for(var i in request.data.data) {
+                    var val = request.data.data[i]
+                    // check record
+                    if(sid<=val.sid) sid = val.sid
+                    delete val.sid
+                    const port = await portModel.getOne({select: '*', filters: {'id': val.id}})
+                    if(port) {
+                        await portModel.updateSync(request.data.data[i])
+                    } else {
+                        await portModel.addSync(request.data.data[i])
+                    }
+                }
+            }
+
+            sync_logs.ports = sid
+            fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
+            res.send({'id':sid})
+        } catch (error) {
+            next()
+        }
+    })
+
+
+
+
 
     app.post('/syncs/visa_types', async (req, res) => {
         var data = []
