@@ -18,7 +18,7 @@ const axios = require('axios')
 
 module.exports = function(app) {
 
-    // SUB
+    // SUB SERVER CALL
     app.post('/syncs/users_from_central', async (req, res, next) => {        
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
@@ -58,7 +58,7 @@ module.exports = function(app) {
     })
 
 
-    // SUB 
+    // SUB SERVER CALL
     app.post('/syncs/users_profile_to_central', async (req, res) => {
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
@@ -152,7 +152,7 @@ module.exports = function(app) {
         }
         res.send({'data': data && data.length ? data : null})
     })
-    // SUB
+    // SUB SERVER CALL
     app.post('/syncs/visa_types_from_central', async (req, res, next) => {
         var sync_logs = {}
         var request = null
@@ -194,7 +194,7 @@ module.exports = function(app) {
         res.send({'data': data && data.length ? data : null})
     })
 
-    // SUB
+    // SUB SERVER CALL
     app.post('/syncs/countries_from_central', async (req, res, next) => {
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
@@ -245,7 +245,7 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothings update'})
     })
 
-    // SUB
+    // SUB SERVER CALL
     app.post('/syncs/activity_logs_to_central', async (req, res) => {
         const data = await activityLogModel.getActivitySync({select: 'a.*, bin_to_uuid(a.id) as id, bin_to_uuid(a.uid) as uid, bin_to_uuid(a.record_id) as record_id', filters: {'sid': '0'}})
         console.log(data)
@@ -287,7 +287,7 @@ module.exports = function(app) {
         }
         return res.status(200).send({'message': 'Nothing is update'})
     })
-    // SUB 
+    // SUB SERVER CALL 
     app.post('/syncs/checklists_to_central', async (req, res) => {
         const data = await checklistModel.getChecklistSync({select: 'c.*, bin_to_uuid(c.id) as id, bin_to_uuid(c.uid) as uid',  filters: {'sid': '0'}})   
         try {
@@ -303,6 +303,44 @@ module.exports = function(app) {
     })
 
 
+
+    app.post('/syncs/passports_from_sub', async (req, res) => {
+        const body = req.body
+        if(body != null && body.data){
+            try {
+                for( i in body.data){
+                    const val = body.data[i]
+                    const result = await passportModel.getOne({select: 'bin_to_uuid(pid) as pid', filters: {'pid': val.pid}})
+                    if(result == null){
+                        await passportModel.addSync(val)
+                    } else {
+                        await passportModel.updateSync(result.pid, val, 'pid')
+                    }   
+                }
+                return res.status(200).send({'message': 'sync success'})    
+            } catch (error) {
+             // console.log('error')
+             return res.status(422).send({'message': error.message })   
+            }
+        }
+        return res.status(200).send({'message': 'Nothing is update'})
+    })
+
+
+    // SUB SERVER CALL
+    app.post('/syncs/passports_to_central', async (req, res) => {
+        const data = await passportModel.getPassportSync({select: 'p.*, bin_to_uuid(p.pid) as pid, bin_to_uuid(p.vid) as vid, bin_to_uuid(p.uid) as uid',  filters: {'sid': '0'}})
+        try {
+            const result = await axios.post(config.centralUrl+'syncs/passports_from_sub', { 'data': data })
+            if(result && result.status==200){
+                await passportSyncModel.delete()
+                return res.send({'message': 'sync success'})
+            }
+        } catch (error) {
+            // console.log('sync error')
+        }
+        return res.status(200).send({'message': 'Nothing update'})
+    })
 
 
 
