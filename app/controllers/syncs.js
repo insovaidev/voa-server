@@ -75,7 +75,6 @@ module.exports = function(app) {
             } catch (error) {
                 // console.log('sync error')
             }
-
         }
         return res.status(200).send({'message': 'Nothing update'})
     })
@@ -91,7 +90,7 @@ module.exports = function(app) {
                     const val = body.data[i]
                     const result = await userModel.getOne({select: 'bin_to_uuid(uid) as uid', filters: {'uid': val.uid}})     
                     if(result){
-                        await userModel.updateSync(val.uid, val, 'uid')
+                        await userModel.updateProfileSync(val.uid, val, 'uid')
                     } 
                 }
                 return res.status(200).send({'message': 'sync success'})    
@@ -116,7 +115,7 @@ module.exports = function(app) {
 
 
 
-    
+
 
 
 
