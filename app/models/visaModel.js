@@ -4,6 +4,28 @@ const table = "visas"
 
 module.exports = {
 
+    getVisaSync: async function({select=null, filters=null}={}){
+        const q = db(table+' as v')
+        
+        // Select
+        q.select()
+        if(select) q.select(db.raw(select))
+        
+        // Join
+        q.join(db.raw('visas_sync'+' as s on v.vid=s.id'))
+        
+        q.orderBy('s.sid', 'asc')
+ 
+        // Where condition
+        if(filters){
+            if(filters.sid) q.where('s.sid', '>', parseInt(filters.sid))
+        }
+
+        // Return data
+        const result = await q
+        return result && result.length ? result : null
+    },
+    
     get: async function({select=null, filters=null}={}){
         const q = db(table+' as v') 
         

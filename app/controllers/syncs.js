@@ -10,6 +10,10 @@ const printedVisasModel = require('../models/printedVisasModel')
 const deletedVisasModel = require('../models/deletedVisasModel')
 const activityLogSyncModel = require('../models/activityLogSyncModel')
 const checklistSyncModel = require('../models/checklistSyncModel')
+const passportSyncModel = require('../models/passportSyncModel')
+const visaSyncModel = require('../models/visaSyncModel') 
+
+
 
 const fs = require('fs')
 const config = require('../config/config')
@@ -47,7 +51,7 @@ module.exports = function(app) {
             // res.status(201).send({'message': 'CONFUSE SERVER'})
         }
     })
-    // VOA
+    // CENTRAL
     app.post('/syncs/users_to_sub', async (req, res) => {
         var data = []
         if(req.body.sid != undefined) {
@@ -82,7 +86,7 @@ module.exports = function(app) {
         }
         return res.status(200).send({'message': 'Nothing update'})
     })
-    // VOA 
+    // CENTRAL
     app.post('/syncs/users_profile_from_sub', async (req, res) => {
         const body = req.body
         if(body != null && body.data){
@@ -103,7 +107,7 @@ module.exports = function(app) {
     })
 
 
-    // VOA
+    // CENTRAL
     app.post('/syncs/ports_to_sub', async (req, res) => {
         var data = []
         if(req.body.sid != undefined) {
@@ -143,7 +147,7 @@ module.exports = function(app) {
     })
 
 
-    // VOA
+    // CENTRAL
     app.post('/syncs/visa_types_to_sub', async (req, res) => {
         var data = []
         if(req.body.sid != undefined) {
@@ -184,7 +188,7 @@ module.exports = function(app) {
     })
 
 
-    // VOA
+    // CENTRAL
     app.post('/syncs/countries_to_sub', async (req, res) => {
         var data = []
         if(req.body.sid != undefined) {
@@ -224,7 +228,7 @@ module.exports = function(app) {
     })
 
 
-    // VOA 
+    // CENTRAL
     app.post('/syncs/activity_logs_from_sub', async (req, res) => {
         const body = req.body
         if(body != null && body.data){
@@ -265,7 +269,7 @@ module.exports = function(app) {
 
 
     // Checklists
-    // VOA
+    // CENTRAL
     app.post('/syncs/checklists_from_sub', async (req, res) => {
         const body = req.body
         if(body != null && body.data){
@@ -303,7 +307,8 @@ module.exports = function(app) {
     })
 
 
-
+    // Passports
+    // CENTRAL
     app.post('/syncs/passports_from_sub', async (req, res) => {
         const body = req.body
         if(body != null && body.data){
@@ -325,8 +330,6 @@ module.exports = function(app) {
         }
         return res.status(200).send({'message': 'Nothing is update'})
     })
-
-
     // SUB SERVER CALL
     app.post('/syncs/passports_to_central', async (req, res) => {
         const data = await passportModel.getPassportSync({select: 'p.*, bin_to_uuid(p.pid) as pid, bin_to_uuid(p.vid) as vid, bin_to_uuid(p.uid) as uid',  filters: {'sid': '0'}})
@@ -343,23 +346,9 @@ module.exports = function(app) {
     })
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // VOA 
-    app.post('/syncs/visas', async (req, res) => {
+    // Visas
+    // CENTRAL 
+    app.post('/syncs/visas_from_sub', async (req, res) => {
         const body = req.body
         if(body != null && body.data){
             try {
@@ -381,7 +370,42 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothing is update'})
     })
 
+    // SUB SERVER CALL
+    app.post('/syncs/visas_to_central', async (req, res, next) => {
+        const data = await visaModel.getVisaSync({select: 'v.*, bin_to_uuid(v.vid) as vid, bin_to_uuid(v.uid) as uid',  filters: {'sid': '0'}})           
+        if(data && data.length ){
+            // Upload To Central
+            data.forEach(async val => {
+                let attFiles = null
+                if(val.attachments !=undefined ){
+                    attFiles = JSON.parse(val.attachments)
+                    if( attFiles !=undefined){
+                        for (const [key, value] of Object.entries(attFiles)) {
+                            const data = new FormData();
+                            data.append('file', fs.createReadStream(config.uploadDir+value));
+                            try {
+                                const upload = await axios.post(config.centralUrl+'upload_sync', data, { headers: { 'attachments': value,  'accept': 'application/json', 'Accept-Language': 'en-US,en;q=0.8','Content-Type': `multipart/form-data; boundary=${data._boundary}`,}})  
+                            } catch (error) {
+                                //  
+                            }          
+                        }
+                    }                  
+               } 
+            })
 
+            // Send Data To Central
+            try {
+                const result = await axios.post(config.centralUrl+'syncs/visas_from_sub', { 'data': data })
+                if(result && result.status==200){
+                    await visaSyncModel.delete()
+                    return res.send({'message': 'sync success'})
+                }
+            } catch (error) {
+                // console.log('sync error')
+            }
+        }
+        return res.status(200).send({'message': 'Nothing update'})
+    })
 
 
 
