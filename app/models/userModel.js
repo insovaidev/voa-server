@@ -133,11 +133,29 @@ module.exports = {
         return result && result[0] && result.length ? result[0] : null
     },
 
-    updateSync: async function(id, data, idType="uid") {
+    updateProfileSync: async function(id, data, idType="uid") {
         const body = generalLib.omit(data, 'uid', 'sid')
         body.updated_at = generalLib.formatDateTime(data.updated_at)
         const result = await db(table).update(body).whereRaw('uid = uuid_to_bin('+"'"+id+"'"+')')
         return result == 1
+    },
+
+    addSync: async function(data){
+        const body = generalLib.omit(data, 'uid')
+        body.logined_at = generalLib.formatDateTime(data.logined_at)
+        body.logout_at = generalLib.formatDateTime(data.logout_at)
+        body.created_at = generalLib.formatDateTime(data.created_at)
+        body.updated_at = generalLib.formatDateTime(data.updated_at)
+        const result  = await db(table).insert({uid: db.raw('uuid_to_bin("'+data.uid+'")'),...body})
+        return result[0]       
+    },
+
+    updateSync: async function(data){
+        const body = generalLib.omit(data, 'uid', 'last_user_agent', 'last_ip', 'logout_at', 'logined_at')        
+        body.created_at = generalLib.formatDateTime(data.created_at)
+        body.updated_at = generalLib.formatDateTime(data.updated_at)
+        const result = await db(table).update(body).whereRaw('uid = uuid_to_bin('+"'"+data.uid+"'"+')')
+        return result == 1    
     },
     
 }

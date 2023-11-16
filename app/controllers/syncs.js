@@ -22,12 +22,15 @@ module.exports = function(app) {
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.users != undefined ? sync_logs.users : 0  
+        console.log('sid', sid)
     
     try {    
         request = await axios.post(config.centralUrl+'syncs/users_to_sub', {'sid': parseInt(sid)})    
         if(request && request.data != null && request.data.data) {
+
                 for(var i in request.data.data) {
                     var val = request.data.data[i]
+
                     // check record
                     if(sid<=val.sid) sid = val.sid
                     delete val.sid
@@ -51,7 +54,6 @@ module.exports = function(app) {
 
     // VOA
     app.post('/syncs/users_to_sub', async (req, res) => {
-        console.log('call')
         var data = []
         if(req.body.sid != undefined) {
           var sid = req.body.sid
