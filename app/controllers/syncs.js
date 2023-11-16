@@ -51,6 +51,7 @@ module.exports = function(app) {
 
     // VOA
     app.post('/syncs/users_to_sub', async (req, res) => {
+        console.log('call')
         var data = []
         if(req.body.sid != undefined) {
           var sid = req.body.sid
