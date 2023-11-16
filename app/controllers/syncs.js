@@ -200,7 +200,7 @@ module.exports = function(app) {
 
         console.log(sid)
 
-        
+
         try {
             const request = await axios.post(config.centralUrl+'syncs/countries_to_sub', {'sid': parseInt(sid)})    
             
@@ -208,10 +208,10 @@ module.exports = function(app) {
             
             
             if(request.data != null && request.data.data) {
-                console.log('request', request)
+                // console.log('request', request)
                 for(var i in request.data.data) {
                     var val = request.data.data[i]
-                    console.log('val', val)
+                    // console.log('val', val)
                     if(sid<=val.sid) sid = val.sid
                     delete val.sid
                     const country = await countryModel.getOne({select: '*', filters: {'id': val.id}})

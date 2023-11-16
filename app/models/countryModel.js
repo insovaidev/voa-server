@@ -59,4 +59,18 @@ module.exports = {
         const result = await db(table).update(body).whereRaw('id = uuid_to_bin('+"'"+data.id+"'"+')')
         return result == 1    
     },
+    
+    getOne: async function({select=null, filters=null}={}){
+        const q = db(table)
+        
+        q.select()
+        if(select) q.select(db.raw(select))
+
+        if(filters){
+            if(filters.id) q.whereRaw('id='+'uuid_to_bin('+"'"+filters.id+"'"+')')
+        }
+        
+        const result = await q;
+        return result && result[0] && result.length ? result[0] : null
+    },
 }
