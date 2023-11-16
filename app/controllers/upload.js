@@ -8,27 +8,23 @@ const sizeOf = require('image-size')
 module.exports = function(app) {
 
     // Check Auth
-    // app.use('/upload', checkAuth)
+    app.use('/upload', checkAuth)
     
     // handle file upload and save in tmp folder
     app.post('/upload', async (req, res) => {
-
-        return res.status(403).send({'message': 'Not Allowed.'})
-
         const form = new formidable.IncomingForm()
         const [fields, files] = await form.parse(req)
-        
-        const me = {
-            'port': "PSN"
-        }
+        const me = req.me    
 
         if(files && files.file && files.file.length) {
             const file = files.file[0]
             const extension = (file.originalFilename.split('.').slice(-1)[0]).toLowerCase()
             if(!config.allowExtension.includes(extension)) return res.status(422).send({'message':'File extension is invalid. Please upload file with extension '+config.allowExtension.join(', ')+'.'})
             try {
+                
                 const name = (me.port+'-'+Date.now()+'-'+passwordLib.generate(12))+'.'+extension
                 const newFilePath = config.tmpDir+name
+
                 // Move upload file to tmp
                     if(fileLib.copy(file.filepath, newFilePath, true)){
                         try {
@@ -55,7 +51,6 @@ module.exports = function(app) {
             }
         }
 
-        // return res.status(422).send({'message':'Upload has been failed.'})    
-    
-    })    
+        return res.status(422).send({'message':'Upload has been failed.'})    
+    })
 }

@@ -28,7 +28,7 @@ module.exports = function (app) {
         filters.lastDay = 1
 
         // Role and Permission
-        if (me.role == 'super_admin' || me.role == 'admin' || me.role == 'report') return res.status(403).send({ 'message': `Role ${me.role} is not allowed to add visa.` })
+        if(me.role && ['super_admin', 'admin', 'report'].includes(me.role)) return res.status(403).send({ 'message': `Role ${me.role} is not allowed to add visa.` })
 
         // Allowed Role sub_admin & Role staff that have permissions 
         if (me.role == 'staff' && (user = await userModel.get({ select: 'permissions', filters: { uid: me.id } }))) {
@@ -38,7 +38,7 @@ module.exports = function (app) {
             if (!perms.includes('add_visa')) return res.status(403).send({ 'message': 'Do not have permission to view visa.' })
         }
 
-        if (me.port) filters.port = me.port
+        filters.port = me.port
 
         // Get Recent
         if (await visaModel.get({ filters: { 'passport_id': body.passport_id, 'minusHour': '4', deleted: '0' } })) return res.status(422).send({ 'message': 'The passport already has a visa. Please delete it first before you issue it again!' })
@@ -229,8 +229,6 @@ module.exports = function (app) {
         // Select
         const select = 'bin_to_uuid(v.vid) as vid, p.passport_no, p.surname,p.full_name,p.given_name, p.port, v.remarks, p.nationality, p.pob,p.phone,p.issued_date as passport_issued_date, p.expire_date as passport_expire_date, p.dob, p.sex, p.profession, p.email, v.visa_id, v.visa_no, v.visa_no_on_photo, v.travel_no, v.visa_type, v.travel_from, p.address, p.address_in_cambodia, p.entry_at, v.travel_purpose, v.final_city, v.created_at, v.printed, v.printed_at, v.officer_notes, v.expire_date, v.issued_date, v.attachments'
 
-        // if (me.port) filters.port = me.port
-
         if (result = await visaModel.get({ select: select, filters: filters })) {
 
             const visaType = await visaTypeModel.get(result.visa_type)
@@ -270,7 +268,7 @@ module.exports = function (app) {
         }
 
         // Role and Permissions
-        if (me.role == 'super_admin' || me.role == 'admin' || me.role == 'report') return res.status(403).send({ 'message': `Role ${me.role} is not allowed to scan visa.` })
+        if(me.role && ['super_admin', 'admin', 'report'].includes(me.role)) return res.status(403).send({ 'message': `Role ${me.role} is not allowed to scan visa.` })
 
         // Allowed Role sub_admin & Role staff that have permissions 
         if (me.role == 'staff' && (user = await userModel.get({ select: 'permissions', filters: { uid: me.id } }))) {
@@ -359,7 +357,7 @@ module.exports = function (app) {
         }
 
         // Role and Permissions
-        if (me.role == 'super_admin' || me.role == 'admin' || me.role == 'report') return res.status(403).send({ 'message': `Role ${me.role} is not allowed to scan visa.` })
+        if(me.role && ['super_admin', 'admin', 'report'].includes(me.role)) return res.status(403).send({ 'message': `Role ${me.role} is not allowed to scan visa.` })
 
         // Allowed Role sub_admin & Role staff that have permissions 
         if (me.role == 'staff' && (user = await userModel.get({ select: 'permissions', filters: { uid: me.id } }))) {
@@ -489,12 +487,8 @@ module.exports = function (app) {
         let data = []
         var report_time_zone = 0
         var filters = Object.assign({}, req.query)
-        // if(!filters.deleted) filters.deleted = '0' 
         const me = req.me
-        const device_id = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null
-
-        const device = await deviceModel.get({ select: '*', filters: { 'device_id': device_id } })
-
+    
         // Role and Permission
         if (me.role == 'report') return res.status(403).send({ 'message': `Role ${me.role} is not allowed to read applications.` })
 
@@ -591,7 +585,7 @@ module.exports = function (app) {
         // Role and Permission
         if (me.role == 'report') return res.status(403).send({ 'message': `Role ${me.role} is not allowed to read applications.` })
 
-        if (me.role != 'super_admin' && me.role != 'admin' && me.role != 'sub_admin' && (user = await userModel.get({ select: 'permissions', filters: { uid: me.id } }))) {
+        if (me.role == 'staff' && (user = await userModel.get({ select: 'permissions', filters: { uid: me.id } }))) {
             let perms = []
             if (!user.permissions) return res.status(403).send({ 'message': 'Do not have permission to request data.' })
             perms.push(...user.permissions.split(','));
