@@ -24,7 +24,6 @@ module.exports = function(app) {
 
     // SUB SERVER CALL
     app.post('/syncs/users_from_central', async (req, res, next) => {        
-        console.log('users')
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.users != undefined ? sync_logs.users : 0  
@@ -65,7 +64,6 @@ module.exports = function(app) {
 
     // SUB SERVER CALL
     app.post('/syncs/users_profile_to_central', async (req, res) => {
-        console.log('profile')
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.profile != undefined ? sync_logs.profile : 0       
@@ -117,7 +115,6 @@ module.exports = function(app) {
     })
     // SUB SERVER CALL
     app.post('/syncs/ports_from_central', async (req, res, next) => {
-        console.log('port')
         var sync_logs = {}
         let request = null;
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
@@ -158,8 +155,6 @@ module.exports = function(app) {
     })
     // SUB SERVER CALL
     app.post('/syncs/visa_types_from_central', async (req, res, next) => {
-        console.log('visa_types')
-
         var sync_logs = {}
         var request = null
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
@@ -201,7 +196,6 @@ module.exports = function(app) {
     })
     // SUB SERVER CALL
     app.post('/syncs/countries_from_central', async (req, res, next) => {
-        console.log('countries')
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.countries != undefined ? sync_logs.countries : 0
@@ -252,8 +246,6 @@ module.exports = function(app) {
     })
     // SUB SERVER CALL
     app.post('/syncs/activity_logs_to_central', async (req, res) => {
-        console.log('activity_logs')
-
         const data = await activityLogModel.getActivitySync({select: 'a.*, bin_to_uuid(a.id) as id, bin_to_uuid(a.uid) as uid, bin_to_uuid(a.record_id) as record_id', filters: {'sid': '0'}})        
         try {
             const result = await axios.post(config.centralUrl+'syncs/activity_logs_from_sub', { 'data': data })
@@ -292,8 +284,6 @@ module.exports = function(app) {
     })
     // SUB SERVER CALL 
     app.post('/syncs/checklists_to_central', async (req, res) => {
-        console.log('checklists')
-
         const data = await checklistModel.getChecklistSync({select: 'c.*, bin_to_uuid(c.id) as id, bin_to_uuid(c.uid) as uid',  filters: {'sid': '0'}})   
         try {
             const result = await axios.post(config.centralUrl+'syncs/checklists_from_sub', { 'data': data })
@@ -333,7 +323,6 @@ module.exports = function(app) {
     })
     // SUB SERVER CALL
     app.post('/syncs/passports_to_central', async (req, res) => {
-        console.log('passports')
         const data = await passportModel.getPassportSync({select: 'p.*, bin_to_uuid(p.pid) as pid, bin_to_uuid(p.vid) as vid, bin_to_uuid(p.uid) as uid',  filters: {'sid': '0'}})
         try {
             const result = await axios.post(config.centralUrl+'syncs/passports_from_sub', { 'data': data })
@@ -373,8 +362,6 @@ module.exports = function(app) {
     })
     // SUB SERVER CALL
     app.post('/syncs/visas_to_central', async (req, res, next) => {
-        console.log('visas')
-
         const data = await visaModel.getVisaSync({select: 'v.*, bin_to_uuid(v.vid) as vid, bin_to_uuid(v.uid) as uid',  filters: {'sid': '0'}})                   
         if(data && data.length ){
             // Upload To Central
@@ -436,11 +423,7 @@ module.exports = function(app) {
     })
     // SUB SERVER CALL
     app.post('/syncs/printed_visas_to_central', async (req, res) => {
-        console.log('vias print')
-
         const data = await printedVisasModel.getVisasSync({select: 'pv.*, bin_to_uuid(pv.id) as id, bin_to_uuid(pv.vid) as vid, bin_to_uuid(pv.uid) as uid',  filters: {'sid': '0'}})           
-        
-        
         if(data && data.length ){
             try {
             const result = await axios.post(config.centralUrl+'syncs/printed_visas_from_sub', { 'data': data })
@@ -481,8 +464,6 @@ module.exports = function(app) {
     })
     // SUB SERVER CALL
     app.post('/syncs/deleted_visas_to_central', async (req, res) => {
-        console.log('delete visas')
-
         const data = await deletedVisasModel.getVisasSync({select: 'dv.*, bin_to_uuid(dv.id) as id, bin_to_uuid(dv.vid) as vid, bin_to_uuid(dv.uid) as uid',  filters: {'sid': '0'}})        
         if(data && data.length ){   
             // Upload To Central
