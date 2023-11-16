@@ -12,9 +12,8 @@ const activityLogSyncModel = require('../models/activityLogSyncModel')
 const checklistSyncModel = require('../models/checklistSyncModel')
 const passportSyncModel = require('../models/passportSyncModel')
 const visaSyncModel = require('../models/visaSyncModel') 
-
-
-
+const printedVisasSyncModel = require('../models/printedVisasSyncModel')
+const deletedVisasSyncModel = require('../models/deletedVisasSyncModel');
 const fs = require('fs')
 const config = require('../config/config')
 const axios = require('axios')
@@ -408,72 +407,9 @@ module.exports = function(app) {
     })
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    app.post('/syncs/passports', async (req, res) => {
-        const body = req.body
-        if(body != null && body.data){
-            try {
-                for( i in body.data){
-                    const val = body.data[i]
-                    const result = await passportModel.getOne({select: 'bin_to_uuid(pid) as pid', filters: {'pid': val.pid}})
-                    if(result == null){
-                        await passportModel.addSync(val)
-                    } else {
-                        await passportModel.updateSync(result.pid, val, 'pid')
-                    }   
-                }
-                return res.status(200).send({'message': 'sync success'})    
-            } catch (error) {
-             // console.log('error')
-             return res.status(422).send({'message': error.message })   
-            }
-        }
-        return res.status(200).send({'message': 'Nothing is update'})
-    })
-
-    app.post('/syncs/checklists', async (req, res) => {
-        const body = req.body
-        if(body != null && body.data){
-            try {
-                for( i in body.data){
-                    const val = body.data[i]
-                    const result = await checklistModel.getOne({select: 'bin_to_uuid(id) as id', filters: {'id': val.id}})
-                    if(result==null){
-                        await checklistModel.addSync(body.data[i])
-                    } else {
-                        await checklistModel.updateSync(result.id, val, 'id')
-                    }   
-                }
-                return res.status(200).send({'message': 'sync success'})    
-            } catch (error) {
-             // console.log('error')
-             return res.status(422).send({'message': error.message })   
-            }
-        }
-        return res.status(200).send({'message': 'Nothing is update'})
-    })
-
-    app.post('/syncs/printed_visas', async (req, res) => {
+    // Visas Printed
+    // CENTRAL 
+    app.post('/syncs/printed_visas_from_sub', async (req, res) => {
         const body = req.body
         if(body != null && body.data){
             try {
@@ -495,7 +431,28 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothing is update'})
     })
 
-    app.post('/syncs/deleted_visas', async (req, res) => {
+    // SUB SERVER CALL
+    app.post('/syncs/printed_visas_to_central', async (req, res) => {
+        const data = await printedVisasModel.getVisasSync({select: 'pv.*, bin_to_uuid(pv.id) as id, bin_to_uuid(pv.vid) as vid, bin_to_uuid(pv.uid) as uid',  filters: {'sid': '0'}})           
+        try {
+            const result = await axios.post(config.centralUrl+'syncs/printed_visas_from_sub', { 'data': data })
+            if(result && result.status==200){
+                await printedVisasSyncModel.delete()
+                return res.send({'message': 'sync success'})
+            }
+        } catch (error) {
+            // console.log('sync error')
+        }
+        return res.status(200).send({'message': 'Nothing update'})
+    })
+
+
+
+
+
+    // Visas Printed
+    // CENTRAL 
+    app.post('/syncs/deleted_visas_from_sub', async (req, res) => {
         const body = req.body
         // console.log(body)
         if(body != null && body.data){
@@ -518,6 +475,40 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothing is update'})
     })
 
-   
+
+    // SUB SERVER CALL
+    app.post('/syncs/deleted_visas_to_central', async (req, res) => {
+        const data = await deletedVisasModel.getVisasSync({select: 'dv.*, bin_to_uuid(dv.id) as id, bin_to_uuid(dv.vid) as vid, bin_to_uuid(dv.uid) as uid',  filters: {'sid': '0'}})        
+        if(data && data.length ){   
+            // Upload To Central
+            data.forEach(async val => {
+                let attFiles = null
+                if(val.attachments !=undefined ){
+                    attFiles = JSON.parse(val.attachments)
+                    if( attFiles !=undefined){
+                        for (const [key, value] of Object.entries(attFiles)) {
+                            const data = new FormData();
+                            data.append('file', fs.createReadStream(config.uploadDir+value));
+                            try {
+                                const upload = await axios.post(config.centralUrl+'upload_sync', data, { headers: { 'attachments': value,  'accept': 'application/json', 'Accept-Language': 'en-US,en;q=0.8','Content-Type': `multipart/form-data; boundary=${data._boundary}`,}})  
+                            } catch (error) {
+                                //  
+                            }          
+                        }
+                    }                  
+                } 
+            })
+            try {
+                const result = await axios.post(config.centralUrl+'syncs/deleted_visas_from_sub', { 'data': data })
+                if(result && result.status==200){
+                    await deletedVisasSyncModel.delete()
+                    return res.send({'message': 'sync success'})
+                }
+            } catch (error) {
+                // console.log('sync error')
+            }
+        return res.status(200).send({'message': 'Nothing update'})
+        }
+    })
 
 }

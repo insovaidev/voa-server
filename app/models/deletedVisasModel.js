@@ -57,6 +57,27 @@ module.exports = {
         const result  = await db(table).update({vid: db.raw('uuid_to_bin("'+data.vid+'")'), uid: db.raw('uuid_to_bin("'+data.uid+'")'), ...body}).where(db.raw('id=uuid_to_bin('+"'"+id+"'"+')')) 
         return result? data.id : null
     },
-   
+    getVisasSync: async function({select=null, filters=null}={}){
+        const q = db(table+' as dv')
+        
+        // Select
+        q.select()
+        if(select) q.select(db.raw(select))
+        
+        // Join
+        q.join(db.raw('deleted_visas_sync'+' as s on dv.id=s.id'))
+        
+        // Sort
+        q.orderBy('s.sid', 'asc')
+ 
+        // Where condition
+        if(filters){
+            if(filters.sid) q.where('s.sid', '>', parseInt(filters.sid))
+        }
+
+        // Return data
+        const result = await q
+        return result && result.length ? result : null
+    },
 }
 

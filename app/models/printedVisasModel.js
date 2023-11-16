@@ -4,6 +4,28 @@ const db = require('../services/dbService')
 const table = "printed_visas"
 
 module.exports = {
+
+    getVisasSync: async function({select=null, filters=null}={}){
+        const q = db(table+' as pv')
+        
+        // Select
+        q.select()
+        if(select) q.select(db.raw(select))
+        
+        // Join
+        q.join(db.raw('printed_visas_sync'+' as s on pv.id=s.id'))
+        
+        // Sort
+        q.orderBy('s.sid', 'asc')
+ 
+        // Where condition
+        if(filters){
+            if(filters.sid) q.where('s.sid', '>', parseInt(filters.sid))
+        }
+    // Return data
+        const result = await q
+        return result && result.length ? result : null
+    },
    
     get: async function({select=null, filters=null}={}){
 
