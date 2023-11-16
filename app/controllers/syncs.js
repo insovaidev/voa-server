@@ -9,6 +9,8 @@ const checklistModel = require("../models/checklistModel")
 const printedVisasModel = require('../models/printedVisasModel')
 const deletedVisasModel = require('../models/deletedVisasModel')
 const activityLogSyncModel = require('../models/activityLogSyncModel')
+const checklistSyncModel = require('../models/checklistSyncModel')
+
 const fs = require('fs')
 const config = require('../config/config')
 const axios = require('axios')
@@ -141,7 +143,6 @@ module.exports = function(app) {
     })
 
 
-
     // VOA
     app.post('/syncs/visa_types_to_sub', async (req, res) => {
         var data = []
@@ -263,6 +264,43 @@ module.exports = function(app) {
 
 
 
+    // Checklists
+    // VOA
+    app.post('/syncs/checklists_from_sub', async (req, res) => {
+        const body = req.body
+        if(body != null && body.data){
+            try {
+                for( i in body.data){
+                    const val = body.data[i]
+                    const result = await checklistModel.getOne({select: 'bin_to_uuid(id) as id', filters: {'id': val.id}})
+                    if(result==null){
+                        await checklistModel.addSync(body.data[i])
+                    } else {
+                        await checklistModel.updateSync(result.id, val, 'id')
+                    }   
+                }
+                return res.status(200).send({'message': 'sync success'})    
+            } catch (error) {
+             // console.log('error')
+             return res.status(422).send({'message': error.message })   
+            }
+        }
+        return res.status(200).send({'message': 'Nothing is update'})
+    })
+    // SUB 
+    app.post('/syncs/checklists_to_central', async (req, res) => {
+        const data = await checklistModel.getChecklistSync({select: 'c.*, bin_to_uuid(c.id) as id, bin_to_uuid(c.uid) as uid',  filters: {'sid': '0'}})   
+        try {
+            const result = await axios.post(config.centralUrl+'syncs/checklists_from_sub', { 'data': data })
+            if(result && result.status==200){
+                await checklistSyncModel.delete()
+                return res.send({'message': 'sync success'})
+            }
+        } catch (error) {
+            // console.log('sync error')
+        }
+        return res.status(200).send({'message': 'Nothing update'})
+    })
 
 
 
@@ -282,10 +320,7 @@ module.exports = function(app) {
 
 
 
-
-
-
-    
+    // VOA 
     app.post('/syncs/visas', async (req, res) => {
         const body = req.body
         if(body != null && body.data){
@@ -307,6 +342,30 @@ module.exports = function(app) {
         }
         return res.status(200).send({'message': 'Nothing is update'})
     })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     app.post('/syncs/passports', async (req, res) => {
         const body = req.body
