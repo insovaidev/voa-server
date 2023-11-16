@@ -44,7 +44,6 @@ module.exports = function(app) {
                             return res.status(422).send({'message': 'File is invalid. Please upload file image only.'})
                         }
 
-
                     }
                 } catch (error) {
                 return res.status(422).send({'message': error.message })

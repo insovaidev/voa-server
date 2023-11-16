@@ -91,7 +91,7 @@ module.exports = {
         this.filters(q, filters)
 
         // Sort
-        q.limit(filters && filters.limit != undefined ? filters.limit : 30)
+        q.limit(30)
         q.offset(filters && filters.offset != undefined ? filters.offset : 0)
         q.orderBy(filters && filters.sort != undefined ? filters.sort : 'created_at', filters && filters.sort_value != undefined ? filters.sort_value : 'desc' )
         

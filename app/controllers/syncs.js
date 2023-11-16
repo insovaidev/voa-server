@@ -1,3 +1,7 @@
+const fs = require('fs')
+const config = require('../config/config')
+const axios = require('axios')
+const FormData = require('form-data');
 const activityLogModel = require("../models/activityLogModel")
 const portModel = require("../models/portModel")
 const userModel = require("../models/userModel")
@@ -14,11 +18,6 @@ const passportSyncModel = require('../models/passportSyncModel')
 const visaSyncModel = require('../models/visaSyncModel') 
 const printedVisasSyncModel = require('../models/printedVisasSyncModel')
 const deletedVisasSyncModel = require('../models/deletedVisasSyncModel');
-const fs = require('fs')
-const config = require('../config/config')
-const axios = require('axios')
-const FormData = require('form-data');
-
 
 
 module.exports = function(app) {
@@ -69,9 +68,6 @@ module.exports = function(app) {
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.profile != undefined ? sync_logs.profile : 0       
         const data = await userModel.getUserSync({select: 'bin_to_uuid(u.uid) as uid, u.password, u.phone, u.sex, u.name, u.email, u.updated_at, s.sid' , filters: {'sid': sid}})     
-        
-        console.log(data)
-        
         if(data){
             const lastSid = data[0].sid
             try {
@@ -369,11 +365,7 @@ module.exports = function(app) {
 
     // SUB SERVER CALL
     app.post('/syncs/visas_to_central', async (req, res, next) => {
-        const data = await visaModel.getVisaSync({select: 'v.*, bin_to_uuid(v.vid) as vid, bin_to_uuid(v.uid) as uid',  filters: {'sid': '0'}})           
-       
-       
-        
-        
+        const data = await visaModel.getVisaSync({select: 'v.*, bin_to_uuid(v.vid) as vid, bin_to_uuid(v.uid) as uid',  filters: {'sid': '0'}})                   
         if(data && data.length ){
             // Upload To Central
             data.forEach(async val => {
@@ -384,7 +376,6 @@ module.exports = function(app) {
                         for (const [key, value] of Object.entries(attFiles)) {
                             const data = new FormData();
                             data.append('file', fs.createReadStream(config.uploadDir+value));
-                            console.log('data', data)
                             try {
                                 const upload = await axios.post(config.centralUrl+'upload_sync', data, { headers: { 'attachments': value,  'accept': 'application/json', 'Accept-Language': 'en-US,en;q=0.8','Content-Type': `multipart/form-data; boundary=${data._boundary}`,}})  
                             } catch (error) {
