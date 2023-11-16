@@ -21,6 +21,7 @@ module.exports = {
 
     // For File Upload
     baseUrl: process.env.BASEURL || 'http://127.0.0.1:3000/',
+    centralUrl: process.env.CENTRAL_URL,  
     tmpDir: 'tmp/',
     uploadDir: 'uploads/',
     pdfDir: 'pdf/',

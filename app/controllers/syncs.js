@@ -8,9 +8,53 @@ const passportModel = require('../models/passportModel')
 const checklistModel = require("../models/checklistModel")
 const printedVisasModel = require('../models/printedVisasModel')
 const deletedVisasModel = require('../models/deletedVisasModel')
+const fs = require('fs')
+const config = require('../config/config')
+const axios = require('axios')
 
 
 module.exports = function(app) {
+
+    // Sync Users
+    app.post('/syncs/users_from_central', async (req, res, next) => {        
+        let request = null;
+        var sync_logs = {}
+        if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
+        var sid = sync_logs.users != undefined ? sync_logs.users : 0  
+    
+    try {
+        
+        request = await axios.post(config.centralUrl+'syncs/users_to_local', {'sid': parseInt(sid)})
+        
+        console.log(request)
+        
+        
+        return 
+        
+    
+        if(request && request.data != null && request.data.data) {
+                // for(var i in request.data.data) {
+                //     var val = request.data.data[i]
+                //     // check record
+                //     if(sid<=val.sid) sid = val.sid
+                //     delete val.sid
+                //     const user = await userModel.get({select: '*', filters: {'uid': val.uid}})
+                //     if(user) {
+                //         await userModel.updateSync(request.data.data[i])
+                //     } else {
+                //         await userModel.addSync(request.data.data[i])
+                //     }
+                // }
+            }
+            sync_logs.users = sid
+            fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
+            res.send({'id': sid })
+        } catch (error) {
+            next()
+            // res.status(201).send({'message': 'CONFUSE SERVER'})
+        }
+    })
+
     
     app.post('/syncs/users', async (req, res) => {
         var data = []
