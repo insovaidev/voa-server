@@ -1,4 +1,6 @@
 const db = require('../services/dbService')
+const generalLib = require('../libraries/generalLib')
+
 
 const table = "countries"
 
@@ -59,7 +61,7 @@ module.exports = {
         const result = await db(table).update(body).whereRaw('id = uuid_to_bin('+"'"+data.id+"'"+')')
         return result == 1    
     },
-    
+
     getOne: async function({select=null, filters=null}={}){
         const q = db(table)
         

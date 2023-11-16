@@ -4,6 +4,30 @@ const generalLib = require('../libraries/generalLib')
 const table = "activity_logs"
 
 module.exports = {
+
+    getActivitySync: async function({select=null, filters=null}={}){
+        const q = db(table+' as a')
+        
+        // Select
+        q.select()
+        if(select) q.select(db.raw(select))
+        
+        // Join
+        q.join(db.raw('activity_logs_sync'+' as s on a.id=s.id'))
+        
+        // Sort
+        q.orderBy('s.sid', 'asc')
+ 
+        // Where condition
+        if(filters){
+            if(filters.sid) q.where('s.sid', '>', parseInt(filters.sid))
+        }
+ 
+        // Return data
+        const result = await q
+        return result && result.length ? result : null
+    },
+    
     get: async function({select=null, filters=null}={}) {
         const q = db(table)
         q.select()

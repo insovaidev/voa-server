@@ -198,21 +198,11 @@ module.exports = function(app) {
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.countries != undefined ? sync_logs.countries : 0
 
-        console.log(sid)
-        
-
-
         try {
             const request = await axios.post(config.centralUrl+'syncs/countries_to_sub', {'sid': parseInt(sid)})    
-            
             if(request.data != null && request.data.data) {
-                // console.log('request', request)
                 for(var i in request.data.data) {
                     var val = request.data.data[i]
-
-                    // console.log(val)
-                    
-                    
                     if(sid<=val.sid) sid = val.sid
                     delete val.sid
                     const country = await countryModel.getOne({select: '*', filters: {'id': val.id}})
@@ -223,21 +213,17 @@ module.exports = function(app) {
                     }
                 }
             }
-
             sync_logs.countries = sid
             fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
-            res.send({'id':sid})
-            
+            res.send({'id':sid})   
         } catch (error) {
             next()
-        }
-        
+        }        
     })
 
 
-
-
-    app.post('/syncs/activity_logs', async (req, res) => {
+    // VOA 
+    app.post('/syncs/activity_logs_from_sub', async (req, res) => {
         const body = req.body
         if(body != null && body.data){
             try {
@@ -256,6 +242,46 @@ module.exports = function(app) {
         }
         return res.status(200).send({'message': 'Nothings update'})
     })
+
+    // SUB
+    app.post('/syncs/activity_logs_to_central', async (req, res) => {
+        const data = await activityLogModel.getActivitySync({select: 'a.*, bin_to_uuid(a.id) as id, bin_to_uuid(a.uid) as uid, bin_to_uuid(a.record_id) as record_id', filters: {'sid': '0'}})
+        try {
+            const result = await axios.post(config.centralUrl+'syncs/activity_logs_from_sub', { 'data': data })
+            if(result && result.status==200){
+                await activityLogSyncModel.delete()
+                return res.send({'message': 'sync success'})
+            }
+        } catch (error) {
+            // console.log('sync error')
+        }
+        return res.status(200).send({'message': 'Nothing update'})
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     app.post('/syncs/visas', async (req, res) => {
         const body = req.body
