@@ -23,7 +23,8 @@ const deletedVisasSyncModel = require('../models/deletedVisasSyncModel');
 module.exports = function(app) {
 
     // SUB SERVER CALL
-    app.post('/syncs/users_from_central', async (req, res, next) => {        
+    app.post('/syncs/users_from_central', async (req, res, next) => {   
+        console.log('Sync User')     
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.users != undefined ? sync_logs.users : 0  
@@ -495,6 +496,91 @@ module.exports = function(app) {
             }
         }
         return res.status(200).send({'message': 'Nothing update'})
+    })
+
+    
+    // Call this route for sync data
+    app.get('/syncs/sync_data', async (req, res) => {
+        const URL = 'http://192.168.88.209:8081'
+        axios.post(URL+'/syncs/users_from_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+
+        axios.post(URL+'/syncs/users_profile_to_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        axios.post(URL+'/syncs/ports_from_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        axios.post(URL+'/syncs/visa_types_from_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        axios.post(URL+'/syncs/countries_from_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        axios.post(URL+'/syncs/activity_logs_to_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        axios.post(URL+'/syncs/checklists_to_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        axios.post(URL+'/syncs/passports_to_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        axios.post(URL+'/syncs/visas_to_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        axios.post(URL+'/syncs/printed_visas_to_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+        axios.post(URL+'/syncs/deleted_visas_to_central', {})
+        .then(function (response) {
+        console.log(response);
+        })
+        .catch(function (error) {
+        console.log(error);
+        });
+
     })
 
 }
