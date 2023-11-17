@@ -5,6 +5,7 @@ const checkAuth = require('../middleware/checkAuth')
 const userModel = require('../models/userModel')
 const config = require('../config/config')
 const xlsx = require("json-as-xlsx")
+const fs = require('fs')
 
 
 module.exports = function(app) {
@@ -60,7 +61,6 @@ module.exports = function(app) {
                 delete val.total;
             })
         }
-
         if(result = await reportModel.total({select: 'v.sex', groupBy: 'bin_to_uuid(v.vid)', filters: filters})) {
             total = result.length
             let id = 1
@@ -88,10 +88,21 @@ module.exports = function(app) {
             return { ...obj, no: index + 1 };
         });
 
+        
+
         const start_date_str = generalLib.date({setDate: filters.start_date})
         const end_date_str = generalLib.date({setDate: filters.end_date})
         const sheetName = start_date_str+'-'+end_date_str
-        
+
+        // Create Dir
+        var dist = ""
+        config.pdfDir.split('/').forEach(v => {
+            if(v.indexOf(".") < 0) {
+                dist += "/"+v
+                if (!fs.existsSync("."+dist)) fs.mkdirSync("."+dist)
+            }
+        })
+
         let data = [
                 {
                 sheet: sheetName,
@@ -108,7 +119,7 @@ module.exports = function(app) {
                 content: contents
             },
         ]
-    
+
         let settings = {
             fileName: excelFilePath,
             extraLength: 3,
@@ -117,17 +128,13 @@ module.exports = function(app) {
             RTL: false,
         }
     
-        // Path xlsx 
-        const xlsxUrl = config.baseUrl+config.pdfDir+deviceId+'.xlsx' 
-        
-        // Generate xlsx
+        const xlsxUrl = config.baseUrl+config.pdfDir+deviceId+'.xlsx'
         try {
             xlsx(data , settings)
             return res.status(200).send({'url': xlsxUrl})
         } catch (error) {
-            // console.log(erroe)
+            // console.log(error)
         }
         return res.send({'message': 'Export Fail.'})
-
     })
 }
