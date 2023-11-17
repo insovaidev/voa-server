@@ -301,7 +301,7 @@ module.exports = function (app) {
         // console.log(addUser.status)
        
        
-        if(addUser && addUser.status == 201){
+        if(!addUser){
             // console.log(result)
            return res.status(403).send({'message': 'Error'})
         }
