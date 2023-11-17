@@ -269,7 +269,7 @@ module.exports = function (app) {
         if(me.role=='report' || me.role=='staff') return res.status(403).send({'message': `Role ${me.role} can not add a user to this system.`})
         
         // Check duplicate user
-        if(result=await userModel.get({selec:'username', filters: { username: data.username }})) {
+        if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
             return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
         } 
 
@@ -298,7 +298,7 @@ module.exports = function (app) {
         // await userModel.add(body)
 
         const result = await axios.post(config.centralUrl+'users/create', body)
-        
+
         if(!result){
             // console.log(result)
             res.status(403).send({'message': 'Error'})
