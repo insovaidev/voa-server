@@ -91,7 +91,9 @@ module.exports = {
         
 
         // Search
-        if(filters.search_type && filters.search_value != undefined) q.where(filters.search_type, 'like' ,`%${filters.search_value}%`)        
+        if(filters.search_type == 'all' && filters.search_value != undefined ){
+            q.whereRaw("CONCAT(p.passport_no, p.full_name, v.visa_no)"+' like '+`'%${filters.search_value}%'`) 
+        } else if(filters.search_type && filters.search_value != undefined) q.where(filters.search_type, 'like' ,`%${filters.search_value}%`)  
 
         // Return Result
         const result = await q
@@ -109,8 +111,10 @@ module.exports = {
         q.count('p.passport_no as total')
         
         this.filters(q, filters)
-
-        if(filters.search_type && filters.search_value != undefined) q.where(filters.search_type, 'like' ,`%${filters.search_value}%`)        
+        
+        if(filters.search_type == 'all' && filters.search_value != undefined ){
+            q.whereRaw("CONCAT(p.passport_no, p.full_name, v.visa_no)"+' like '+`'%${filters.search_value}%'`) 
+        } else if(filters.search_type && filters.search_value != undefined) q.where(filters.search_type, 'like' ,`%${filters.search_value}%`)  
 
         // Group By Record
         if(groupBy) q.groupBy(db.raw(groupBy))
