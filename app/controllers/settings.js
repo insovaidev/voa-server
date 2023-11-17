@@ -299,7 +299,7 @@ module.exports = function (app) {
         try {
             const addUser = await axios.post(config.centralUrl+'users/create', body)
             if(addUser){
-                
+
                 if(user=await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: { uid: data.uid }})){
                     const data_json = generalLib.omit(user, 'password') 
                     data_json.logined_at = generalLib.formatDateTime(data_json.logined_at)
@@ -328,19 +328,7 @@ module.exports = function (app) {
         } catch (error) {
             console.log(error)
         }
-
-        // console.log(addUser.status)
-       
-       
-        // if(!addUser){
-        //     // console.log(result)
-        //    return res.status(403).send({'message': 'Error'})
-        // }
-        
-        // console.log('add act')
-
-
-        
+             
         return res.status(403).send({'message': 'create fail.'})
   
         if(user=await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: { uid: data.uid }})){
