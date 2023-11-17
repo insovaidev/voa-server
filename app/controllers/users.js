@@ -4,7 +4,7 @@ module.exports = function(app){
     // Central
     app.post('/users/create', async (req, res) => {
         const body = req.body
-        console.log(body)
+        // console.log(body)
         const userData = {
             'username': body.username,
             'name': body.name,
@@ -19,11 +19,11 @@ module.exports = function(app){
         }
         const result = 1
         // if(result = await userModel.add(userData)){
-        if(result==1){
+        if(result == 1){
             // const user =  await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: {'uid': userData.uid}})
             const user = userData
             return res.status(201).send({'data': user })
         }
-       return res.status(403).send({'message': 'create fail.'})
+        return res.status(403).send({'message': 'create fail.'})
     })
 }

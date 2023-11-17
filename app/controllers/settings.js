@@ -298,6 +298,7 @@ module.exports = function (app) {
         // await userModel.add(body)
         try {
             const addUser = await axios.post(config.centralUrl+'users/create', body)
+            
             if(addUser){
                     const actData = addUser.data
                     actData.logined_at = generalLib.formatDateTime(actData.logined_at)
