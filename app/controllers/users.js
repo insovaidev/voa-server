@@ -4,7 +4,7 @@ module.exports = function(app){
     // Central
     app.post('/users/create', async (req, res) => {
         const body = req.body
-        
+        console.log(body)
         const userData = {
             'username': body.username,
             'name': body.name,
