@@ -227,7 +227,7 @@ module.exports = function(app) {
             'no_balcklist': no_balcklist,
             'not_check_with_als': not_check_with_als
         }
-        return res.send({ 'total': total, 'limit': parseInt(filters.limit), 'offset': parseInt(filters.offset),  'data': data , ...response })
+        return res.send({ 'total': total, 'limit': 30, 'offset': parseInt(filters.offset),  'data': data , ...response })
     })
 
     app.get('/checklists/:id', async(req, res) => {
