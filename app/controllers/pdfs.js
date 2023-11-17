@@ -46,6 +46,15 @@ module.exports = function (app) {
         const device = await deviceModel.get({select: 'port', filters: {'device_id': deviceId}})
         const deviceData = JSON.stringify(device)
 
+        // Create Dir
+        var dist = ""
+        config.pdfDir.split('/').forEach(v => {
+            if(v.indexOf(".") < 0) {
+                dist += "/"+v
+                if (!fs.existsSync("."+dist)) fs.mkdirSync("."+dist)
+            }
+        })
+
         // Write File
         if(filters){
             if(filters.report_by=='visa_type'){

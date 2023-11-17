@@ -88,8 +88,7 @@ module.exports = function(app) {
             return { ...obj, no: index + 1 };
         });
 
-        
-
+    
         const start_date_str = generalLib.date({setDate: filters.start_date})
         const end_date_str = generalLib.date({setDate: filters.end_date})
         const sheetName = start_date_str+'-'+end_date_str
