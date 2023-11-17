@@ -510,7 +510,7 @@ module.exports = function(app) {
     })
 
     
-    // Call this route for sync data
+    // Sync Data
     app.get('/syncs/sync_data', async (req, res) => {
         const URL = 'http://192.168.88.209:8081'
 
