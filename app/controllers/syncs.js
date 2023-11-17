@@ -500,7 +500,7 @@ module.exports = function(app) {
 
     // Sync Data
     app.get('/syncs/sync_data', async (req, res) => {
-        const URL = 'http://192.168.88.209:8081'
+        const URL = 'http://192.168.196.8:8081'
 
         axios.post(URL+'/syncs/users_from_central', {})
         .then(function (response) {

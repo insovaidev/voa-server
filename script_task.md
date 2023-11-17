@@ -26,3 +26,6 @@ PowerShell Invoke-WebRequest -Uri "http://localhost:8081/syncs/passports_to_cent
 PowerShell Invoke-WebRequest -Uri "http://localhost:8081/syncs/visas_to_central" -Method POST;
 PowerShell Invoke-WebRequest -Uri "http://localhost:8081/syncs/printed_visas_to_central" -Method POST;
 PowerShell Invoke-WebRequest -Uri "http://localhost:8081/syncs/deleted_visas_to_central" -Method POST;
+
+
+PowerShell Invoke-WebRequest -Uri "http://192.168.196.8:8081/syncs/sync_data" -Method GET;
