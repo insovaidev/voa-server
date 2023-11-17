@@ -299,7 +299,7 @@ module.exports = function (app) {
 
         // try {
             const addUser = await axios.post(config.centralUrl+'users/create', body)
-            console.log(addUser.data)
+            // console.log(addUser.data)
             if(addUser && addUser.data.data != undefined){
                 const actData = addUser.data.data
                 actData.logined_at = generalLib.formatDateTime(actData.logined_at)
@@ -307,24 +307,24 @@ module.exports = function (app) {
                 actData.updated_at = generalLib.formatDateTime(actData.updated_at)
                 actData.logout_at = generalLib.formatDateTime(actData.logout_at)
 
-                // if(!me.port) device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
-                // await activityLogModel.add({
-                //     id: generalLib.generateUUID(me.port),
-                //     uid: me.id, 
-                //     ip: generalLib.getIp(req), 
-                //     port: me.port ? me.port : device.port, 
-                //     record_id: data.uid,
-                //     ref_id: user.username,
-                //     device_id: deviceId,
-                //     record_type: 'users', 
-                //     action: 'add', 
-                //     data: JSON.stringify(actData)
-                // })
+                if(!me.port) device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
+                await activityLogModel.add({
+                    id: generalLib.generateUUID(me.port),
+                    uid: me.id, 
+                    ip: generalLib.getIp(req), 
+                    port: me.port ? me.port : device.port, 
+                    record_id: data.uid,
+                    ref_id: user.username,
+                    device_id: deviceId,
+                    record_type: 'users', 
+                    action: 'add', 
+                    data: JSON.stringify(actData)
+                })
 
                 return res.status(201).send({'message': 'success'})
             } 
             const status = addUser.data.status
-            console.log(status)
+            // console.log(status)
             if(status == 422) return res.status(422).send({'message': addUser.data.message})
             if(status == 403) return res.status(403).send({'message': addUser.data.message})
 
