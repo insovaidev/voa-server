@@ -17,9 +17,9 @@ module.exports = function(app){
             'last_user_agent': body.last_user_agent,
             'last_ip': body.last_ip,
         }
-        const result =  true
+        const result = 0
         // if(result = await userModel.add(userData)){
-        if(result){
+        if(result !== 0){
             return res.status(201).send({'message': 'created success'})
         }
     
