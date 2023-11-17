@@ -269,9 +269,9 @@ module.exports = function (app) {
         if(me.role=='report' || me.role=='staff') return res.status(403).send({'message': `Role ${me.role} can not add a user to this system.`})
         
         // Check duplicate user
-        if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
-            return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
-        } 
+        // if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
+        //     return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
+        // } 
 
         data.uid = generalLib.generateUUID(me.port)
         data['password'] = await passwordLib.hash(data.password);
@@ -321,8 +321,8 @@ module.exports = function (app) {
             } 
             return res.status(201).send({'message': 'success'})
         } catch (error) {
-            // console.log(error.data)
-            return res.status(403).send({'message': error})    
+            if(error.message.status == 422) return res.status(422).send({'message': 'User already existed.'})
+            // return res.status(403).send({'message': 'Create user fail.'})    
         }
     })
 

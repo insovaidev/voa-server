@@ -5,8 +5,8 @@ module.exports = function(app){
     app.post('/users/create', async (req, res) => {
         const body = req.body
 
-        if(exist=await userModel.get({select:'username', filters: { username: body.username }})) {
-            return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
+        if(exist = await userModel.get({select:'username', filters: { username: body.username }})) {
+            return res.status(422).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
         } 
         // console.log(body)
         const userData = {
@@ -21,6 +21,7 @@ module.exports = function(app){
             'last_user_agent': body.last_user_agent,
             'last_ip': body.last_ip,
         }
+
         const result = 0
         // if(result = await userModel.add(userData)){
         if(result == 1){
@@ -44,9 +45,8 @@ module.exports = function(app){
                 "updated_at": "2023-11-17T16:25:54.000Z",
                 "created_at": "2023-08-03T19:29:11.000Z"
             }
-
             return res.status(201).send({'data': user })
         }
-        return res.status(401).send({'message': 'create fail.'})
+        return res.status(403).send({'message': 'create fail.'})
     })
 }
