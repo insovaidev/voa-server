@@ -108,7 +108,14 @@ module.exports = {
         q.orderBy(filters.sort && filters.sort != undefined ? filters.sort : 'vid', filters.sort_value && filters.sort_value != undefined ? filters.sort_value : 'desc' )
         
         // Search
-        if(filters.search_type && filters.search_value != undefined) q.where(filters.search_type, 'like' ,`%${filters.search_value}%`)
+        if(filters.search_type && filters.search_value != undefined) {
+            q.where(filters.search_type, 'like' ,`%${filters.search_value}%`)
+        }
+        filters.search_type == 'all'
+        if(filters.search_type == 'all'){
+            q.whereRaw("CONCAT(v.visa_no, v.sex, v.nationality)"+'like'+`%${filters.search_value}%`) 
+        }
+
 
         // Return Result
         const result = await q
