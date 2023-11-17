@@ -297,14 +297,17 @@ module.exports = function (app) {
         // Add User
         // await userModel.add(body)
 
-        const result = await axios.post(config.centralUrl+'users/create', body)
-
-        if(!result){
+        const addUser = await axios.post(config.centralUrl+'users/create', body)
+        // console.log(addUser.status)
+       
+       
+        if(addUser && addUser.status == 201){
             // console.log(result)
-            res.status(403).send({'message': 'Error'})
+           return res.status(403).send({'message': 'Error'})
         }
         
         console.log('add act')
+
         return res.status(201).send({'message': 'success'})
 
         
