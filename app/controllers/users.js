@@ -5,7 +5,7 @@ module.exports = function(app){
     app.post('/users/create', async (req, res) => {
         const body = req.body
 
-        if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
+        if(result=await userModel.get({select:'username', filters: { username: body.username }})) {
             return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
         } 
         // console.log(body)
