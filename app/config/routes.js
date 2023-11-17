@@ -20,6 +20,8 @@ module.exports = function(app) {
     require('../controllers/port_sync')(app)
     require('../controllers/blacklist')(app)
     require('../controllers/visas')(app)
+    require('../controllers/users')(app)
+
 
     // default route
     app.use(function (req, res, next) {

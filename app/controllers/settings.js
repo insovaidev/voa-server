@@ -10,7 +10,9 @@ const visaModel = require('../models/visaModel');
 const visaTypeModel = require("../models/visaTypeModel");
 const countryModel = require("../models/countryModel");
 const deviceModel = require('../models/deviceModel')
-const userSyncModel = require('../models/userSyncModel')
+const userSyncModel = require('../models/userSyncModel');
+const { default: axios } = require("axios");
+const config = require("../config/config");
 
 
 module.exports = function (app) {
@@ -293,7 +295,22 @@ module.exports = function (app) {
         const body = generalLib.omit(data, 'confirmPassword')
 
         // Add User
-        await userModel.add(body)
+        // await userModel.add(body)
+        try {
+            const result = await axios.post(config.centralUrl+'users/create', body)
+            if(result && result.status !== 201){
+                res.status(403).send({'message': 'Error'})
+            }
+            
+            console.log('add act')
+            return res.status(201).send({'message': 'success'})
+
+        } catch (error) {
+            
+        } 
+  
+        return 
+  
         if(user=await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: { uid: data.uid }})){
             const data_json = generalLib.omit(user, 'password') 
             data_json.logined_at = generalLib.formatDateTime(data_json.logined_at)
