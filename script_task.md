@@ -29,3 +29,4 @@ PowerShell Invoke-WebRequest -Uri "http://localhost:8081/syncs/deleted_visas_to_
 
 
 PowerShell Invoke-WebRequest -Uri "http://192.168.196.8:8081/syncs/sync_data" -Method GET;
+PowerShell Invoke-WebRequest -Uri "http://192.168.196.8:8081/syncs/sync_data" -Method GET;

@@ -502,6 +502,8 @@ module.exports = function(app) {
     app.get('/syncs/sync_data', async (req, res) => {
         const URL = 'http://192.168.196.8:8081'
 
+        console.log('sync')
+
         axios.post(URL+'/syncs/users_from_central', {})
         .then(function (response) {
         // console.log(response);
@@ -517,7 +519,6 @@ module.exports = function(app) {
         .catch(function (error) {
         console.log(error);
         });
-
 
         axios.post(URL+'/syncs/ports_from_central', {})
         .then(function (response) {
