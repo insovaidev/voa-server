@@ -22,7 +22,6 @@ module.exports = function(app){
         if(result == 1){
             return res.status(201).send({'message': 'created success'})
         }
-    
-        res.status(403).send({'message': 'create fail.'})
+       return res.status(403).send({'message': 'create fail.'})
     })
 }
