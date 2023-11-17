@@ -256,7 +256,7 @@ module.exports = function (app) {
             }
             return true;
         })
-    ],async (req, res ) => {
+    ],async (req, res, next) => {
         var data = req.body
         const me = req.me
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null  
@@ -320,12 +320,12 @@ module.exports = function (app) {
                     // })
             } 
             return res.status(201).send({'message': 'success'})
+            next()
         // } catch (error) {
         //     console.log(error.message)
         //     // if(error.message.status == 422) return res.status(422).send({'message': 'User already existed.'})
         //     // return res.status(403).send({'message': 'Create user fail.'})  v
         //     return res.status(403).send({'message': error})    
-
         // }
     })
 
