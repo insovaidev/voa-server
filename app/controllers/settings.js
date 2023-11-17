@@ -300,7 +300,9 @@ module.exports = function (app) {
             const addUser = await axios.post(config.centralUrl+'users/create', body)
             
             if(addUser){
-                    const actData = addUser.data
+
+                    const actData = addUser.data.data
+
                     actData.logined_at = generalLib.formatDateTime(actData.logined_at)
                     actData.created_at = generalLib.formatDateTime(actData.created_at)
                     actData.updated_at = generalLib.formatDateTime(actData.updated_at)

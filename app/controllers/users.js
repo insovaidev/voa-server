@@ -21,7 +21,25 @@ module.exports = function(app){
         // if(result = await userModel.add(userData)){
         if(result == 1){
             // const user =  await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: {'uid': userData.uid}})
-            const user = userData
+            const user = {
+                "uid": "f5d68f76-607b-5bcd-a978-25958fb56bf1",
+                "username": "u001",
+                "name": "user 001",
+                "phone": null,
+                "sex": "f",
+                "email": null,
+                "permissions": null,
+                "port": null,
+                "photo": null,
+                "banned": 0,
+                "role": "staff",
+                "banned_reason": null,
+                "logined_at": "2023-11-17T16:25:54.000Z",
+                "logout_at": "2023-10-04T09:57:06.000Z",
+                "last_ip": "192.168.196.8",
+                "updated_at": "2023-11-17T16:25:54.000Z",
+                "created_at": "2023-08-03T19:29:11.000Z"
+            }
             return res.status(201).send({'data': user })
         }
         return res.status(403).send({'message': 'create fail.'})
