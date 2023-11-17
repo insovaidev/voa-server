@@ -297,7 +297,7 @@ module.exports = function (app) {
         // Add User
         // await userModel.add(body)
 
-        try {
+        // try {
             const addUser = await axios.post(config.centralUrl+'users/create', body)
             if(addUser){
                     const actData = addUser.data.data
@@ -320,10 +320,13 @@ module.exports = function (app) {
                     // })
             } 
             return res.status(201).send({'message': 'success'})
-        } catch (error) {
-            if(error.message.status == 422) return res.status(422).send({'message': 'User already existed.'})
-            // return res.status(403).send({'message': 'Create user fail.'})    
-        }
+        // } catch (error) {
+        //     console.log(error.message)
+        //     // if(error.message.status == 422) return res.status(422).send({'message': 'User already existed.'})
+        //     // return res.status(403).send({'message': 'Create user fail.'})  v
+        //     return res.status(403).send({'message': error})    
+
+        // }
     })
 
     // Update a User
