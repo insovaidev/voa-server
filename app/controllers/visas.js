@@ -528,8 +528,6 @@ module.exports = function (app) {
             filters.offset = 0
         }
         
-        filters.search_type = 'all'
-
         var select = 'bin_to_uuid(p.pid) as pid,p.passport_no,p.expire_date as passport_expire_date,p.nationality,p.sex,p.full_name,p.created_at,p.updated_at, bin_to_uuid(v.vid) as vid, v.visa_no, v.base_id, v.visa_type,v.issued_date,v.expire_date,v.scanned,v.printed,v.deleted'
 
         const lists = await passportModel.list({ select: select, filters: filters })
