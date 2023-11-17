@@ -4,6 +4,10 @@ module.exports = function(app){
     // Central
     app.post('/users/create', async (req, res) => {
         const body = req.body
+        
+        if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
+            return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
+        } 
         // console.log(body)
         const userData = {
             'username': body.username,
@@ -40,6 +44,7 @@ module.exports = function(app){
                 "updated_at": "2023-11-17T16:25:54.000Z",
                 "created_at": "2023-08-03T19:29:11.000Z"
             }
+
             return res.status(201).send({'data': user })
         }
         return res.status(403).send({'message': 'create fail.'})
