@@ -299,29 +299,31 @@ module.exports = function (app) {
         try {
             const addUser = await axios.post(config.centralUrl+'users/create', body)
             if(addUser){
+                    const actData = addUser.data
+                    actData.logined_at = generalLib.formatDateTime(actData.logined_at)
+                    actData.created_at = generalLib.formatDateTime(actData.created_at)
+                    actData.updated_at = generalLib.formatDateTime(actData.updated_at)
+                    actData.logout_at = generalLib.formatDateTime(actData.logout_at)
 
-                if(user=await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: { uid: data.uid }})){
-                    const data_json = generalLib.omit(user, 'password') 
-                    data_json.logined_at = generalLib.formatDateTime(data_json.logined_at)
-                    data_json.created_at = generalLib.formatDateTime(data_json.created_at)
-                    data_json.updated_at = generalLib.formatDateTime(data_json.updated_at)
-                    data_json.logout_at = generalLib.formatDateTime(data_json.logout_at)
-                    if(!me.port) device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
-                    await activityLogModel.add({
-                        id: generalLib.generateUUID(me.port),
-                        uid: me.id, 
-                        ip: generalLib.getIp(req), 
-                        port: me.port ? me.port : device.port, 
-        
-                        record_id: data.uid,
-                        ref_id: user.username,
-                        device_id: deviceId,
-                        record_type: 'users', 
-                        action: 'add', 
-                        data: JSON.stringify(data_json)
-                    })
+                    console.log(actData)
 
-                }
+
+                    // if(!me.port) device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
+                    
+                    // await activityLogModel.add({
+                    //     id: generalLib.generateUUID(me.port),
+                    //     uid: me.id, 
+                    //     ip: generalLib.getIp(req), 
+                    //     port: me.port ? me.port : device.port, 
+                    //     record_id: data.uid,
+                    //     ref_id: user.username,
+                    //     device_id: deviceId,
+                    //     record_type: 'users', 
+                    //     action: 'add', 
+                    //     data: JSON.stringify(actData)
+                    // })
+
+                
             } 
             
             return res.status(201).send({'message': 'success'})
