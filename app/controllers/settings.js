@@ -11,7 +11,7 @@ const visaTypeModel = require("../models/visaTypeModel");
 const countryModel = require("../models/countryModel");
 const deviceModel = require('../models/deviceModel')
 const userSyncModel = require('../models/userSyncModel');
-const { default: axios } = require("axios");
+const axios = require("axios");
 const config = require("../config/config");
 
 
