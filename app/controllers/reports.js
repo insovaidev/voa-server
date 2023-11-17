@@ -351,6 +351,6 @@ module.exports = function(app) {
 
             ])
         }
-        res.send({'data': reportList, 'limit': parseInt(filters.limit), 'offset': parseInt(filters.offset),  'total': total, 'deleted': deleted, 'recreated': recreated, 'not_recreated': deleted-recreated })
+        res.send({'data': reportList, 'limit': 30, 'offset': parseInt(filters.offset),  'total': total, 'deleted': deleted, 'recreated': recreated, 'not_recreated': deleted-recreated })
     })
 }

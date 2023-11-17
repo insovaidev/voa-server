@@ -497,7 +497,7 @@ module.exports = function(app) {
         return res.status(200).send({'message': 'Nothing update'})
     })
 
-    
+
     // Sync Data
     app.get('/syncs/sync_data', async (req, res) => {
         const URL = 'http://192.168.88.209:8081'
