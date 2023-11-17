@@ -4,7 +4,7 @@ module.exports = function(app){
     // Central
     app.post('/users/create', async (req, res) => {
         const body = req.body
-        
+
         if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
             return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
         } 
@@ -21,7 +21,7 @@ module.exports = function(app){
             'last_user_agent': body.last_user_agent,
             'last_ip': body.last_ip,
         }
-        const result = 1
+        const result = 0
         // if(result = await userModel.add(userData)){
         if(result == 1){
             // const user =  await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: {'uid': userData.uid}})

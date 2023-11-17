@@ -321,7 +321,7 @@ module.exports = function (app) {
             } 
             return res.status(201).send({'message': 'success'})
         } catch (error) {
-            // console.log(error)
+            console.log(error)
             return res.status(403).send({'message': 'create fail.'})    
         }
     })
