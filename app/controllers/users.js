@@ -25,6 +25,7 @@ module.exports = function(app){
         if(result = await userModel.add(userData)){
         // if(result == 1){
             const user =  await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: {'uid': userData.uid}})
+          console.log(user)
             // const user = {
             //     "uid": "f5d68f76-607b-5bcd-a978-25958fb56bf1",
             //     "username": "u001",

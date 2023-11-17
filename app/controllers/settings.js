@@ -269,9 +269,9 @@ module.exports = function (app) {
         if(me.role=='report' || me.role=='staff') return res.status(403).send({'message': `Role ${me.role} can not add a user to this system.`})
         
         // Check duplicate user
-        // if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
-        //     return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
-        // } 
+        if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
+            return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
+        } 
 
         data.uid = generalLib.generateUUID(me.port)
         data['password'] = await passwordLib.hash(data.password);
@@ -299,7 +299,7 @@ module.exports = function (app) {
 
         // try {
             const addUser = await axios.post(config.centralUrl+'users/create', body)
-            // console.log(addUser.data)
+            console.log(addUser.data)
             if(addUser && addUser.data.data != undefined){
                 const actData = addUser.data.data
                 actData.logined_at = generalLib.formatDateTime(actData.logined_at)
