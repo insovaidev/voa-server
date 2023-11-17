@@ -19,7 +19,7 @@ module.exports = function(app){
         }
         const result = 0
         // if(result = await userModel.add(userData)){
-        if(result !== 0){
+        if(result == 1){
             return res.status(201).send({'message': 'created success'})
         }
     
