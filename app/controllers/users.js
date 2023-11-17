@@ -6,7 +6,7 @@ module.exports = function(app){
         const body = req.body
 
         if(exist = await userModel.get({select:'username', filters: { username: body.username }})) {
-            return res.status(200).send({'data': {'status': 422, 'message': 'username already exist.'}})
+            return res.status(200).send({'status': 422, 'message': 'username already exist.'})
         } 
 
         // console.log(body)
