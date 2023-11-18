@@ -500,11 +500,11 @@ module.exports = function(app) {
 
     // Sync Data
     app.get('/syncs/sync_data', async (req, res) => {
-        const URL = 'http://192.168.196.8:8081'
+        const URL =  config.baseUrl //  'http://192.168.88.209:8081' // BASE_URL
 
         console.log('sync')
 
-        axios.post(URL+'/syncs/users_from_central', {})
+        axios.post(URL+'syncs/users_from_central', {})
         .then(function (response) {
         // console.log(response);
         })
@@ -512,7 +512,7 @@ module.exports = function(app) {
         console.log(error);
         });
 
-        axios.post(URL+'/syncs/users_profile_to_central', {})
+        axios.post(URL+'syncs/users_profile_to_central', {})
         .then(function (response) {
         // console.log(response);
         })
@@ -520,63 +520,63 @@ module.exports = function(app) {
         console.log(error);
         });
 
-        axios.post(URL+'/syncs/ports_from_central', {})
+        axios.post(URL+'syncs/ports_from_central', {})
         .then(function (response) {
         // console.log(response);
         })
         .catch(function (error) {
         console.log(error);
         });
-        axios.post(URL+'/syncs/visa_types_from_central', {})
+        axios.post(URL+'syncs/visa_types_from_central', {})
         .then(function (response) {
         // console.log(response);
         })
         .catch(function (error) {
         console.log(error);
         });
-        axios.post(URL+'/syncs/countries_from_central', {})
+        axios.post(URL+'syncs/countries_from_central', {})
         .then(function (response) {
         // console.log(response);
         })
         .catch(function (error) {
         console.log(error);
         });
-        axios.post(URL+'/syncs/activity_logs_to_central', {})
+        axios.post(URL+'syncs/activity_logs_to_central', {})
         .then(function (response) {
         // console.log(response);
         })
         .catch(function (error) {
         console.log(error);
         });
-        axios.post(URL+'/syncs/checklists_to_central', {})
+        axios.post(URL+'syncs/checklists_to_central', {})
         .then(function (response) {
         // console.log(response);
         })
         .catch(function (error) {
         console.log(error);
         });
-        axios.post(URL+'/syncs/passports_to_central', {})
+        axios.post(URL+'syncs/passports_to_central', {})
         .then(function (response) {
         // console.log(response);
         })
         .catch(function (error) {
         console.log(error);
         });
-        axios.post(URL+'/syncs/visas_to_central', {})
+        axios.post(URL+'syncs/visas_to_central', {})
         .then(function (response) {
         // console.log(response);
         })
         .catch(function (error) {
         console.log(error);
         });
-        axios.post(URL+'/syncs/printed_visas_to_central', {})
+        axios.post(URL+'syncs/printed_visas_to_central', {})
         .then(function (response) {
         // console.log(response);
         })
         .catch(function (error) {
         console.log(error);
         });
-        axios.post(URL+'/syncs/deleted_visas_to_central', {})
+        axios.post(URL+'syncs/deleted_visas_to_central', {})
         .then(function (response) {
         // console.log(response);
         })
