@@ -27,6 +27,6 @@ module.exports = function(app){
         } catch (error) {
             // console.log(error)
         }
+        return res.status(200).send({'status': 403, 'message': 'create user fail.'})
     })
-    return res.status(200).send({'status': 403, 'message': 'create user fail.'})
 }
