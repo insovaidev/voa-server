@@ -35,4 +35,4 @@ PowerShell Invoke-WebRequest -Uri "http://192.168.196.8:8081/syncs/sync_data" -M
 
 C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
 
-PowerShell Invoke-WebRequest -Uri "http://http://192.168.88.209:8081/syncs/sync_data" -Method GET;
+PowerShell Invoke-WebRequest -Uri "http://192.168.88.209:8081/syncs/sync_data" -Method GET;
