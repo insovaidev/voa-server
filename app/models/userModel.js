@@ -30,6 +30,7 @@ module.exports = {
     },
 
     add: async function(data) {
+        
         const body = generalLib.omit(data, 'uid')
         body.created_at = generalLib.dateTime()
         body.updated_at = generalLib.dateTime()
