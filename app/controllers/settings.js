@@ -353,15 +353,8 @@ module.exports = function (app) {
             if(data.password != data.confirmPassword) return res.status(403).send({'message': 'comfirmPassword not match.'})
             data.password = await passwordLib.hash(data.password)
         }
-
         const body = generalLib.omit(data, 'confirmPassword')
-
         const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
-        console.log(updateUser)
-    
-        return 
-
-
         if(updateUser && updateUser.data.data != undefined){
             const actData = updateUser.data.data
             actData.logined_at = generalLib.formatDateTime(actData.logined_at)
