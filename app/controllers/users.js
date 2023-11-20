@@ -34,6 +34,8 @@ module.exports = function(app){
         const id = req.params.id
         const body = req.body
 
+        console.log(id)
+
 
         
 
@@ -57,7 +59,7 @@ module.exports = function(app){
         //     // console.log(error)
         // }
 
-        
+
         return res.status(200).send({'status': 403, 'message': 'create user fail.'})
     })
 }
