@@ -59,53 +59,16 @@ module.exports = function (app) {
             filters.offset = 0
         }
 
-        const users = {}
-        if(result = await userModel.list({select:'bin_to_uuid(uid) as uid, created_at, username'})){
-            result.forEach((val) => {
-                users[val.uid] = val
-            });
-        }
+       
+        const select = 'bin_to_uuid(a.id) id, bin_to_uuid(a.uid) as uid, a.description, a.record_type, a.action, a.port, a.created_at, bin_to_uuid(a.record_id) as record_id, u.username'
         
-        var select = 'bin_to_uuid(id) id, bin_to_uuid(uid) as uid, description, record_type, action, port, created_at, bin_to_uuid(record_id) as record_id'
-        // For Filters User uids
-        var user_select = 'bin_to_uuid(uid) as uid'
-        const user_filters = {}
-        const uids = [] 
-
-        if(me.role=='admin'){
-            if(me.port) filters.port = me.port
-            user_filters.in_role = ['super_admin']
-        }
-
-        if(me.role=='sub_admin'){
-            user_filters.in_role = ['super_admin', 'admin']
-        }
-
-        // Find User level that can not get activity 
-        if(result = await userModel.list({select: user_select, filters: user_filters})){
-            result.forEach(val => {
-                uids.push(val.uid)
-            })
-            if(!user_filters.uid) filters.not_uids = uids
-        }
-        
-        // Only Can Get Own Activity 
-        if(me.role=='report' || me.role=='staff'){
-            filters.uid = me.id
-            delete filters.not_uids 
-        }
-
-        // Delete uid filter to get all act user level
-        if(me.role=='super_admin') delete filters.not_uids
- 
-        // Get List Activity
         if(result=await activityLogModel.list({select: select, filters:filters})){
             result.forEach(val => {
                 data.push({
                     'id': val.id,
                     'user_id': val.uid,
                     'record_id': val.record_id,
-                    'username': users[val.uid] ? users[val.uid].username : null ,
+                    'username': val.username,
                     'description': val.description,   
                     'record_type': val.record_type,
                     'action': val.action,
@@ -114,11 +77,12 @@ module.exports = function (app) {
                 })
             })
         }
-    
+
+
+
         if(result = await activityLogModel.gets({ filters: filters})){
             total = result[0].total
         }
-
         res.send({ 'total': total, 'limit': 30 , 'offset': parseInt(filters.offset), 'data': data.length > 0 ? data : null })
     })
 
@@ -126,7 +90,7 @@ module.exports = function (app) {
     app.get('/settings/histories/:id', async ( req, res ) => {
         let data = null
         let response = {}
-        let select = 'data, record_type, port, action, bin_to_uuid(uid) as uid, created_at, description'
+        let select = 'a.data, a.record_type, a.port, a.action, bin_to_uuid(a.uid) as uid, a.created_at, a.description'
         var filters = { id: req.params.id }
 
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})  
