@@ -377,36 +377,9 @@ module.exports = function (app) {
             })
             return res.status(201).send({'message': 'success'})
         } 
-        const status = addUser.data.status
-        if(status == 422) return res.status(422).send({'message': addUser.data.message})
-        if(status == 403) return res.status(403).send({'message': addUser.data.message})
-
-        // Add Log
-        // if(await userModel.update(req.params.id, body)){
-        //     // Get User Just Updated & Add Log
-        //     if(user=await userModel.get({select: 'bin_to_uuid(uid) as uid,name,username,sex,phone,email,role,permissions,port,photo,banned,banned_reason,logined_at,logout_at,last_ip,last_user_agent,created_at,updated_at', filters: { uid: req.params.id }})){
-        //         const data_json = generalLib.omit(user, 'password') 
-        //         data_json.logined_at = generalLib.formatDateTime(data_json.logined_at)
-        //         data_json.created_at = generalLib.formatDateTime(data_json.created_at)
-        //         data_json.updated_at = generalLib.formatDateTime(data_json.updated_at)
-        //         data_json.logout_at = generalLib.formatDateTime(data_json.logout_at)
-        //         if(!me.port) device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
-
-        //         await activityLogModel.add({
-        //             id: generalLib.generateUUID(me.port),
-        //             uid: me.id, 
-        //             ip: generalLib.getIp(req), 
-        //             port: me.port ? me.port : device.port,   
-        //             record_id: req.params.id,
-        //             device_id: deviceId,
-        //             ref_id: user.username,
-        //             record_type: 'users', 
-        //             action: 'edit', 
-        //             data: JSON.stringify(data_json)
-        //         })
-        //     }
-        // }
-
+        const status = updateUser.data.status
+        if(status == 422) return res.status(422).send({'message': updateUser.data.message})
+        if(status == 403) return res.status(403).send({'message': updateUser.data.message})
         res.send({'message': 'updated success'})
     })
 
