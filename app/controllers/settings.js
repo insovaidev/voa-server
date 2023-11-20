@@ -22,10 +22,16 @@ module.exports = function (app) {
     
     // History Lists
     app.get('/settings/histories', async ( req, res ) => {
+
         let data = []
         let total = 0
         let report_time_zone = 0
         let filters = Object.assign({}, req.query)
+        
+        
+        console.log(filters)
+        
+        
         const me = req.me
 
         if(me.port) {
