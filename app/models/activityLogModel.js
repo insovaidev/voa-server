@@ -134,20 +134,24 @@ module.exports = {
             if(filters.uid) q.whereRaw('a.uid = uuid_to_bin('+"'"+filters.uid+"'"+')')
             if(filters.id) q.whereRaw('a.id = uuid_to_bin('+"'"+filters.id+"'"+')')
             if(filters.record_id) q.whereRaw('a.record_id = uuid_to_bin('+"'"+filters.record_id+"'"+')')
-           
-            if(filters.record_type){
-                if((!(filters.record_type=='passports' && !filters.pid) || !(filters.record_typ=='visas' && !filters.vid))) {
-                    q.where('a.record_type', filters.record_type)
-                }      
-                if(filters.record_type=='passports' && filters.pid ){
-                    q.whereRaw('a.record_id = uuid_to_bin('+"'"+filters.pid+"'"+')')
-                    q.where('a.record_type', 'passports')
-                }
-                if(filters.record_type=='visas' && filters.vid){
-                    q.whereRaw('a.record_id = uuid_to_bin('+"'"+filters.vid+"'"+')')
-                    q.where('a.record_type', 'visas')
-                }       
-            }     
+            if(filters.record_type) q.where('a.record_type', filters.record_type)
+            
+            
+            // {
+            //     // if((!(filters.record_type=='passports' && !filters.pid) || !(filters.record_typ=='visas' && !filters.vid))) {
+            //     //     q.where('a.record_type', filters.record_type)
+            //     // }      
+            //     if(filters.record_type=='passports' && filters.pid ){
+            //         q.whereRaw('a.record_id = uuid_to_bin('+"'"+filters.pid+"'"+')')
+            //         q.where('a.record_type', 'passports')
+            //     }
+            //     if(filters.record_type=='visas' && filters.vid){
+            //         q.whereRaw('a.record_id = uuid_to_bin('+"'"+filters.vid+"'"+')')
+            //         q.where('a.record_type', 'visas')
+            //     }       
+            // }     
+
+            
         }
     }    
 }
