@@ -35,21 +35,21 @@ module.exports = function(app){
         const id = req.params.id
         const body = req.body
 
-        const userData = {
-            'username': body.username,
-            'name': body.name,
-            'sex': body.sex,
-            'password':  body.password,
-            'role': body.role,
-            'permissions': body.permissions,
-            'port': body.port,
-            'uid': body.uid,
-            'last_user_agent': body.last_user_agent,
-            'last_ip': body.last_ip,
-        }
-
+        // const userData = {
+        //     'username': body.username,
+        //     'name': body.name,
+        //     'sex': body.sex,
+        //     'password':  body.password,
+        //     'role': body.role,
+        //     'permissions': body.permissions,
+        //     'port': body.port,
+        //     'uid': body.uid,
+        //     'last_user_agent': body.last_user_agent,
+        //     'last_ip': body.last_ip,
+        // }
+        const userData = body
         console.log(userData)
-        
+
         // try {
         //     await userModel.update(id, userData)
         //     const user =  await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: {'uid': userData.uid }})
