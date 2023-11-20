@@ -27,6 +27,8 @@ module.exports = function(app) {
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.users != undefined ? sync_logs.users : 0  
+        console.log(sid)
+        
         try {    
             const request = await axios.post(config.centralUrl+'syncs/users_to_sub', {'sid': parseInt(sid)})    
             if(request && request.data != null && request.data.data) {
