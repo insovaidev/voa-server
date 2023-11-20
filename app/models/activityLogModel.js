@@ -82,7 +82,7 @@ module.exports = {
 
 
     list: async function({select=null,  filters}={}) {
-        const q = db(table) 
+        const q = db(table+ ' as a') 
     
         // Select Fields
         q.select()
@@ -93,15 +93,19 @@ module.exports = {
         // Sort
         q.limit(30)
         q.offset(filters && filters.offset != undefined ? filters.offset : 0)
-        q.orderBy(filters && filters.sort != undefined ? filters.sort : 'created_at', filters && filters.sort_value != undefined ? filters.sort_value : 'desc' )
+        q.orderBy(filters && filters.sort != undefined ? 'a.'+filters.sort : 'a.created_at', filters && filters.sort_value != undefined ? 'a.'+filters.sort_value : 'desc' )
         
+
+        q.join(db.raw('users'+' as u on u.uid = a.uid'))
+
+
         // Return Result
         const result = await q
         return result && result.length ? result : null
     },
 
     gets: async function({select=null, groupBy=null, filters}={}){
-        const q = db(table)
+        const q = db(table+ ' as a')
 
         // Select Fields
         if(select || groupBy) q.select(db.raw(select ?? groupBy))
@@ -121,30 +125,27 @@ module.exports = {
     filters: function(q, filters=null) {
         if(filters) {
             // Where Condition
-            if(filters.today) q.where('created_at', '>=', filters.today.start_date)
-            if(filters.today) q.where('created_at', '<=', filters.today.end_date)
-            if(filters.start_date) q.where('created_at', '>=', filters.start_date)
-            if(filters.end_date) q.where('created_at', '<=', filters.end_date)
-            if(filters.port) q.where('port', filters.port) 
-            if(filters.action) q.where('action', filters.action.toUpperCase())
-            if(filters.not_uids){
-                let ids = `('${filters.not_uids.join("','")}')`;
-                q.whereRaw('bin_to_uuid(uid) NOT IN '+ids)
-            } 
-            if(filters.uid) q.whereRaw('uid = uuid_to_bin('+"'"+filters.uid+"'"+')')
-            if(filters.id) q.whereRaw('id = uuid_to_bin('+"'"+filters.id+"'"+')')
-            if(filters.record_id) q.whereRaw('record_id = uuid_to_bin('+"'"+filters.record_id+"'"+')')
+            if(filters.today) q.where('a.created_at', '>=', filters.today.start_date)
+            if(filters.today) q.where('a.created_at', '<=', filters.today.end_date)
+            if(filters.start_date) q.where('a.created_at', '>=', filters.start_date)
+            if(filters.end_date) q.where('a.created_at', '<=', filters.end_date)
+            if(filters.port) q.where('a.port', filters.port) 
+            if(filters.action) q.where('a.action', filters.action.toUpperCase())
+            if(filters.uid) q.whereRaw('a.uid = uuid_to_bin('+"'"+filters.uid+"'"+')')
+            if(filters.id) q.whereRaw('a.id = uuid_to_bin('+"'"+filters.id+"'"+')')
+            if(filters.record_id) q.whereRaw('a.record_id = uuid_to_bin('+"'"+filters.record_id+"'"+')')
+           
             if(filters.record_type){
                 if((!(filters.record_type=='passports' && !filters.pid) || !(filters.record_typ=='visas' && !filters.vid))) {
-                    q.where('record_type', filters.record_type)
+                    q.where('a.record_type', filters.record_type)
                 }      
                 if(filters.record_type=='passports' && filters.pid ){
-                    q.whereRaw('record_id = uuid_to_bin('+"'"+filters.pid+"'"+')')
-                    q.where('record_type', 'passports')
+                    q.whereRaw('a.record_id = uuid_to_bin('+"'"+filters.pid+"'"+')')
+                    q.where('a.record_type', 'passports')
                 }
                 if(filters.record_type=='visas' && filters.vid){
-                    q.whereRaw('record_id = uuid_to_bin('+"'"+filters.vid+"'"+')')
-                    q.where('record_type', 'visas')
+                    q.whereRaw('a.record_id = uuid_to_bin('+"'"+filters.vid+"'"+')')
+                    q.where('a.record_type', 'visas')
                 }       
             }     
         }
