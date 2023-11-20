@@ -18,6 +18,7 @@ const passportSyncModel = require('../models/passportSyncModel')
 const visaSyncModel = require('../models/visaSyncModel') 
 const printedVisasSyncModel = require('../models/printedVisasSyncModel')
 const deletedVisasSyncModel = require('../models/deletedVisasSyncModel');
+const generalLib = require('../libraries/generalLib');
 
 
 module.exports = function(app) {
@@ -28,7 +29,7 @@ module.exports = function(app) {
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.users != undefined ? sync_logs.users : 0  
         console.log(sid)
-        
+
         try {    
             const request = await axios.post(config.centralUrl+'syncs/users_to_sub', {'sid': parseInt(sid)})    
             if(request && request.data != null && request.data.data) {
@@ -501,10 +502,10 @@ module.exports = function(app) {
 
 
     // Sync Data
-    app.get('/syncs/sync_data', async (req, res) => {
+    app.post('/syncs/sync_data', async (req, res) => {
         const URL =  config.baseUrl
 
-        console.log('sync data...')
+        console.log(`Last sync: ${generalLib.formatDateTime(generalLib.dateTime())}`)
 
         axios.post(URL+'syncs/users_from_central', {})
         .then(function (response) {
