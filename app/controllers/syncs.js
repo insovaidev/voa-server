@@ -566,6 +566,7 @@ module.exports = function(app) {
         console.log(error);
         });
         axios.post(URL+'syncs/visas_to_central', {})
+        
         .then(function (response) {
         // console.log(response);
         })
