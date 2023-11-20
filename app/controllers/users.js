@@ -20,6 +20,7 @@ module.exports = function(app){
             'last_user_agent': body.last_user_agent,
             'last_ip': body.last_ip,
         }
+        
         try {
             await userModel.add(userData)
             const user =  await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: {'uid': userData.uid }})
