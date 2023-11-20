@@ -304,10 +304,14 @@ module.exports = function (app) {
 
         if(!(result=await userModel.get({select: 'username', filters: { uid: req.params.id}}))) return res.status(404).send({'message':'User not found.'})
         
+        if(me.role == 'super_admin'){
+            if(data.port==undefined) return res.send({'message': 'For super_admin when update any user must be assign port.'})
+        }
+
         if(me.role=='admin'){
             if(data.role && ['super_admin'].includes(data.role)) return res.send({'message': `As admin can not assign user to role super_admin.`})
             if(me.port==null){
-                if(data.port==undefined) return res.send({'message': 'For admin that has no port when update any user must be has port.'})   
+                if(data.port==undefined) return res.send({'message': 'For admin that has no port when update any user must be assign port.'})   
             }
             if(me.port && data.port && me.port!==data.port) return res.status(403).send({'message': `This Admin can only assign user to port ${me.port}.`})
         }
