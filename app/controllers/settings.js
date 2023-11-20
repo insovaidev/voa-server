@@ -356,12 +356,9 @@ module.exports = function (app) {
 
         const body = generalLib.omit(data, 'confirmPassword')
 
-        console.log(body)
-
         const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
-        
-        // console.log(req.params.id)
-        
+        console.log(updateUser)
+    
         return 
 
 
@@ -378,7 +375,7 @@ module.exports = function (app) {
                 uid: me.id, 
                 ip: generalLib.getIp(req), 
                 port: me.port ? me.port : device.port, 
-                record_id: data.uid,
+                record_id: req.params.id,
                 ref_id: actData.username,
                 device_id: deviceId,
                 record_type: 'users', 
