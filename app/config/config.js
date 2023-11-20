@@ -20,8 +20,8 @@ module.exports = {
     },
 
     // For File Upload
-    baseUrl: process.env.BASEURL,
-    centralUrl: process.env.CENTRAL_URL,  
+    baseUrl: process.env.BASEURL, // URL this server installed
+    centralUrl: process.env.CENTRAL_URL,  // URL central server. Noted: if this server is a central server the URL will be the same.
     tmpDir: 'tmp/',
     uploadDir: 'uploads/',
     pdfDir: 'pdf/',

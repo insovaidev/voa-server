@@ -500,9 +500,9 @@ module.exports = function(app) {
 
     // Sync Data
     app.get('/syncs/sync_data', async (req, res) => {
-        const URL =  config.baseUrl //  'http://192.168.88.209:8081' // BASE_URL
+        const URL =  config.baseUrl
 
-        console.log('sync')
+        console.log('sync data...')
 
         axios.post(URL+'syncs/users_from_central', {})
         .then(function (response) {
