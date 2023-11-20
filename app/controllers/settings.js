@@ -356,6 +356,8 @@ module.exports = function (app) {
 
         const body = generalLib.omit(data, 'confirmPassword')
 
+        console.log(body)
+
         const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
         
         // console.log(req.params.id)
