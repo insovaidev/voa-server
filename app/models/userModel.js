@@ -92,7 +92,6 @@ module.exports = {
 
         // Where condition
         if(filters){
-            console.log(filters)
             if(filters.sid) q.where('s.sid', '>', filters.sid)  
             if(filters.ports){
                 const tuple = `('${filters.ports.join("','")}')`;
