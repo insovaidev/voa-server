@@ -30,10 +30,7 @@ const config = require('./app/config/config')
 
 cron.schedule('*/10 * * * * *', () => {
   console.log('running a task every 30 second');
-  axios.post('http://192.168.88.25:8081/syncs/sync_data')
-  // axios.post(`${config.baseUrl}syncs/sync_data`)
-  axios.post('http://192.168.88.25:8082/syncs/sync_data')
-
+  axios.post(`${proccess.env.CRON_URL}syncs/sync_data`)
 });
 
 
