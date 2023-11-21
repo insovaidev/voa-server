@@ -79,8 +79,6 @@ module.exports = function (app) {
             })
         }
 
-
-
         if(result = await activityLogModel.gets({ filters: filters})){
             total = result[0].total
         }
@@ -231,7 +229,7 @@ module.exports = function (app) {
         if (!errors.isEmpty()) return res.status(422).json(generalLib.formErrors(errors.array()))
 
         // Role and Permission
-        if(['report', 'staff'].includes(data.role)) return res.status(403).send({'message': `Role ${me.role} can not add a user to this system.`})
+        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not add a user to this system.`})
         
         // Check duplicate user
         if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
@@ -295,7 +293,7 @@ module.exports = function (app) {
 
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})  
    
-        if(me.role=='report' || me.role=='staff') return res.status(403).send({'message': `Role ${me.role} can not update a user.`})
+        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not update a user.`})
 
         if(!(result=await userModel.get({select: 'username', filters: { uid: req.params.id}}))) return res.status(404).send({'message':'User not found.'})
         
@@ -499,7 +497,7 @@ module.exports = function (app) {
     
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})
         
-        if(me.role=='report' || me.role=='staff') return res.status(422).status(403).send({'message': `Role ${me.role} can not get a user.`})
+        if(['report', 'staff'].includes(me.role)) return res.status(422).status(403).send({'message': `Role ${me.role} can not get a user.`})
 
         if(me.role=='admin'){
             if(me.port==null){
@@ -532,7 +530,7 @@ module.exports = function (app) {
         const filters = { uid: req.params.id }
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null
 
-        if(me.role=='report' || me.role=='staff') return res.status(403).send({'message': `Role ${me.role} can not do this action.`})
+        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not do this action.`})
     
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})
         if(user=await userModel.get({select: 'bin_to_uuid(uid) as uid,name,username,sex,phone,email,role,permissions,port,photo,banned,banned_reason,logined_at,logout_at,last_ip,last_user_agent,created_at,updated_at',filters: filters})){
@@ -559,7 +557,6 @@ module.exports = function (app) {
             if(body){
                 if(body.banned_reason && body.banned_reason.length) dataBanned.banned_reason = req.body.banned_reason 
                 if(body.banned && body.banned.length){
-
                     dataBanned.banned = req.body.banned
                     if(body.banned == 0) {
                         status= 'Unbanned'
