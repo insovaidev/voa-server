@@ -36,6 +36,8 @@ module.exports = function (app) {
             }
         }
 
+        if(me.role == 'report' || me.role == 'staff') filters.uid = me.id
+
         const h = report_time_zone.toString().replace('-','')
 
         if(start_date = req.query.start_date) filters.start_date = generalLib.dateTime({setDate: start_date, addHour: report_time_zone < 0 ? h : null, minusHour: report_time_zone > 0 ? h : null})
@@ -438,7 +440,6 @@ module.exports = function (app) {
 
         // Not Allowed
         if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not get users.`})
-        
         
         var select = 'bin_to_uuid(uid) as uid, name, username, phone, email, sex, created_at, role, port, banned, banned_reason, permissions'
         
