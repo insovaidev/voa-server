@@ -26,12 +26,7 @@ module.exports = function (app) {
         let data = []
         let total = 0
         let report_time_zone = 0
-        let filters = Object.assign({}, req.query)
-        
-        
-        console.log(filters)
-        
-        
+        let filters = Object.assign({}, req.query) 
         const me = req.me
 
         if(me.port) {
