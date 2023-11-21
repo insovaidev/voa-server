@@ -506,7 +506,7 @@ module.exports = function(app) {
 
 
     // Sync Data
-    app.post('/syncs/sync_data', async (req, res) => {
+    app.get('/syncs/sync_data', async (req, res) => {
         const URL =  config.baseUrl
 
         console.log(`Last sync: ${generalLib.formatDateTime(generalLib.dateTime())}`)
