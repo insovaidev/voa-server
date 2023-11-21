@@ -60,14 +60,12 @@ module.exports = function(app) {
     // CENTRAL
     app.post('/syncs/users_to_sub', async (req, res) => {
         var data = []
+        const data2 = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'no_port': 1}})
         if(req.body.sid != undefined) {
-          var sid = req.body.sid
-          var ports = req.body.ports
-          data = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'sid': sid, 'ports': ports }})
-        //   const data2 = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'no_port': 1}})
-          const data2 = await userModel.sync({select: 'u.port', filters: {'no_port': 1}})
-
-          console.log(data2)
+            var sid = req.body.sid
+            var ports = req.body.ports
+            data = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'sid': sid, 'ports': ports }})
+            console.log(data)
         }
         res.send({'data': data && data.length ? data : null})
     })
