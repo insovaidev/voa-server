@@ -27,11 +27,14 @@ module.exports = function(app) {
     app.post('/syncs/users_from_central', async (req, res, next) => {      
         var sync_logs = {}
         if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
-        var sid = sync_logs.users != undefined ? sync_logs.users : 0  
+        var sid = sync_logs.users != undefined ? sync_logs.users : 0
+        const ports = await portModel.list({select: 'code', filters: {'published': 1}})
+        const listPort = ports.map(row => row.code);
+        console.log(listPort)
         console.log(sid)
 
         try {    
-            const request = await axios.post(config.centralUrl+'syncs/users_to_sub', {'sid': parseInt(sid)}) // ports = ['PHN', 'PSN']
+            const request = await axios.post(config.centralUrl+'syncs/users_to_sub', {'sid': parseInt(sid), 'ports': listPort}) // ports = ['PHN', 'PSN']
             if(request && request.data != null && request.data.data) {
                     for(var i in request.data.data) {
                         var val = request.data.data[i]
@@ -59,7 +62,10 @@ module.exports = function(app) {
         var data = []
         if(req.body.sid != undefined) {
           var sid = req.body.sid
-          data = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'sid': sid }}) // ports []
+          var ports = req.body.ports
+          data = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'sid': sid, 'ports': ports }})
+          const data2 = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'no_port': 1}})
+          console.log(data2)
         }
         res.send({'data': data && data.length ? data : null})
     })
