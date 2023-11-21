@@ -253,7 +253,9 @@ module.exports = function (app) {
         }
 
         if(me.role=='sub_admin'){
-            if(data.role!='report' || data.role!='staff') return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
+            if(['super_admin', 'admin', 'sub_admin'].includes(data.role)) return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
+            if(['report'].includes(data.role) && data.port == undefined ) return res.status(403).send(`Role ${data.role} when assign user must be has port.`)
+            if(['report'].includes(data.role) && data.port != me.port ) return res.status(403).send(`Role ${data.role} when assign user must be in port only (${me.port}).`)
             if(me.port) data.port = me.port
         }
         
