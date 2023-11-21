@@ -65,7 +65,6 @@ module.exports = function(app) {
             var sid = req.body.sid
             var ports = req.body.ports
             data = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'sid': sid, 'ports': ports }})
-            console.log(data)
         }
         res.send({'data': data && data.length ? data : null})
     })
