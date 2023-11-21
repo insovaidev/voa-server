@@ -245,17 +245,15 @@ module.exports = function (app) {
         
         if(me.role=='admin'){
             if(me.port==null){
-                if(data.role=='super_admin') return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
+                if(['super_admin'].includes(data.role)) return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
                 if(data.role=='admin' && data.port==undefined) return res.status(403).send({'message': `Need port for role ${data.role} if user create by ${me.role} that has no port.`})
             }
-            if(data.role=='super_admin' || data.role=='admin') return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
+            if(['super_admin', 'admin'].includes(data.role)) return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
             if(me.port) data.port = me.port
         }
 
         if(me.role=='sub_admin'){
             if(['super_admin', 'admin', 'sub_admin'].includes(data.role)) return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
-            if(['report'].includes(data.role) && data.port == undefined ) return res.status(403).send(`Role ${data.role} when assign user must be has port.`)
-            if(['report'].includes(data.role) && data.port != me.port ) return res.status(403).send(`Role ${data.role} when assign user must be in port only (${me.port}).`)
             if(me.port) data.port = me.port
         }
         
