@@ -93,7 +93,7 @@ module.exports = {
         // Where condition
         if(filters){
             if(filters.sid) q.where('s.sid', '>', filters.sid)    
-            if(filters.not_port && filters.not_port == 1) q.whereRaw('port IS NULL')
+            if(filters.not_port && filters.not_port == 1) q.where('port', NULL)
         }
 
         // Return 
