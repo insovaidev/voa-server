@@ -29,7 +29,6 @@ app.use('/uploads', express.static('uploads'))
 const config = require('./app/config/config')
 
 cron.schedule('*/10 * * * * *', () => {
-  console.log('running a task every 30 second');
   axios.get(`${process.env.CRON_URL}`)
 });
 
