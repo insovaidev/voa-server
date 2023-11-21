@@ -31,7 +31,7 @@ module.exports = function(app) {
         console.log(sid)
 
         try {    
-            const request = await axios.post(config.centralUrl+'syncs/users_to_sub', {'sid': parseInt(sid)})    
+            const request = await axios.post(config.centralUrl+'syncs/users_to_sub', {'sid': parseInt(sid)}) // ports = ['PHN', 'PSN']
             if(request && request.data != null && request.data.data) {
                     for(var i in request.data.data) {
                         var val = request.data.data[i]
@@ -59,7 +59,7 @@ module.exports = function(app) {
         var data = []
         if(req.body.sid != undefined) {
           var sid = req.body.sid
-          data = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'sid': sid }}) 
+          data = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'sid': sid }}) // ports []
         }
         res.send({'data': data && data.length ? data : null})
     })
