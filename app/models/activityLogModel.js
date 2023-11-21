@@ -82,7 +82,6 @@ module.exports = {
 
 
     list: async function({select=null,  filters}={}) {
-        console.log(filters)
         const q = db(table+ ' as a') 
     
         // Select Fields
