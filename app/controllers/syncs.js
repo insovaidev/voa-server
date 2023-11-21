@@ -30,9 +30,7 @@ module.exports = function(app) {
         var sid = sync_logs.users != undefined ? sync_logs.users : 0
         const ports = await portModel.list({select: 'code', filters: {'published': 1}})
         const listPort = ports.map(row => row.code);
-        console.log(listPort)
-        console.log(sid)
-
+        
         try {    
             const request = await axios.post(config.centralUrl+'syncs/users_to_sub', {'sid': parseInt(sid), 'ports': listPort}) // ports = ['PHN', 'PSN']
             if(request && request.data != null && request.data.data) {

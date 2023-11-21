@@ -1,6 +1,8 @@
+
 .env
 /node_modules
 /tmp
 /uploads
 /pdf
 task.md
+sync_logs
