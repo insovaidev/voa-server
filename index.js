@@ -25,6 +25,13 @@ app.use('/tmp', express.static('tmp'))
 app.use('/pdf', express.static('pdf'))
 app.use('/uploads', express.static('uploads'))
 
+cron.schedule('*/30 * * * * *', () => {
+  console.log('running a task every 30 second');
+  axios.post('http://192.168.88.25:8081/syncs/sync_data')
+});
+
+
+
 // Configuration
 const config = require('./app/config/config')
 
