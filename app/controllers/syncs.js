@@ -65,7 +65,7 @@ module.exports = function(app) {
           var ports = req.body.ports
           data = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'sid': sid, 'ports': ports }})
         //   const data2 = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'no_port': 1}})
-          const data2 = await userModel.sync({select: 'u.*, bin_to_uuid(u.uid) as uid, s.sid', filters: {'no_port': 1}})
+          const data2 = await userModel.sync({select: 'u.port', filters: {'no_port': 1}})
 
           console.log(data2)
         }
