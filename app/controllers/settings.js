@@ -222,6 +222,7 @@ module.exports = function (app) {
     ],async (req, res) => {
         var data = req.body
         const me = req.me
+    
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null  
 
         // Check Validate 
@@ -229,7 +230,7 @@ module.exports = function (app) {
         if (!errors.isEmpty()) return res.status(422).json(generalLib.formErrors(errors.array()))
 
         // Role and Permission
-        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not add a user to this system.`})
+        if (me.role == 'report' || me.role == 'staff' ) return res.status(403).send({'message': `Role ${me.role} can not add a user to this system.`})
         
         // Check duplicate user
         if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
@@ -436,7 +437,9 @@ module.exports = function (app) {
         const filters = Object.assign({}, req.query)
 
         // Not Allowed
-        if(['report', 'staff'].includes(data.role)) return res.status(403).send({'message': `Role ${me.role} can not get users.`})
+        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not get users.`})
+        
+        
         var select = 'bin_to_uuid(uid) as uid, name, username, phone, email, sex, created_at, role, port, banned, banned_reason, permissions'
         
         if(me.role=='admin'){
