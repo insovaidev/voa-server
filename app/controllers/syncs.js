@@ -136,9 +136,10 @@ module.exports = function(app) {
                     const port = await portModel.getOne({select: '*', filters: {'id': val.id}})
                     if(port) {
                         await portModel.updateSync(request.data.data[i])
-                    } else {
-                        await portModel.addSync(request.data.data[i])
                     }
+                    //  else {
+                    //     await portModel.addSync(request.data.data[i])
+                    // }
                 }
             }
             sync_logs.ports = sid
