@@ -137,9 +137,9 @@ module.exports = function(app) {
                     if(port) {
                         await portModel.updateSync(request.data.data[i])
                     }
-                    //  else {
-                    //     await portModel.addSync(request.data.data[i])
-                    // }
+                    else {
+                        await portModel.addSync(request.data.data[i])
+                    }
                 }
             }
             sync_logs.ports = sid
