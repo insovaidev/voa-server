@@ -93,7 +93,7 @@ module.exports = {
         // Sort
         q.limit(30)
         q.offset(filters && filters.offset != undefined ? filters.offset : 0)
-        q.orderBy(filters && filters.sort != undefined ? 'a.'+filters.sort : 'a.created_at', filters && filters.sort_value != undefined ? 'a.'+filters.sort_value : 'desc' )
+        q.orderBy(filters && filters.sort != undefined ? 'a.'+filters.sort : 'a.created_at', filters && filters.sort_value != undefined ? filters.sort_value : 'desc' )
         
 
         q.join(db.raw('users'+' as u on u.uid = a.uid'))
