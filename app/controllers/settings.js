@@ -296,6 +296,7 @@ module.exports = function (app) {
             if(!(['admin', 'report'].includes(result.role))) {
                 if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
             }
+            data.port = data.port ? data.port : null
         }
         // Admin
         if(me.role=='admin'){
@@ -305,6 +306,7 @@ module.exports = function (app) {
                 if(!(['report'].includes(result.role))) {
                     if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
                 }
+                data.port = data.port ? data.port : null
             }
             // Admin has port
             if(me.port) {
@@ -324,7 +326,8 @@ module.exports = function (app) {
             if(data.password != data.confirmPassword) return res.status(403).send({'message': 'comfirmPassword not match.'})
             data.password = await passwordLib.hash(data.password)
         }
-        const body = generalLib.omit(data, 'confirmPassword')        
+        const body = generalLib.omit(data, 'confirmPassword')     
+    
         // Request Updata to central
         const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
         // Add activity 
