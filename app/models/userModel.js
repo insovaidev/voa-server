@@ -25,7 +25,6 @@ module.exports = {
 
     update: async function(id, data, idType="uid") {
         data.updated_at = generalLib.dateTime()
-        console.log('data', data)
         const result = await db(table).update(data).whereRaw('uid = uuid_to_bin('+"'"+id+"'"+')')
         return result == 1
     },

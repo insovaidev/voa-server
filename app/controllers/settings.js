@@ -324,16 +324,9 @@ module.exports = function (app) {
             if(data.password != data.confirmPassword) return res.status(403).send({'message': 'comfirmPassword not match.'})
             data.password = await passwordLib.hash(data.password)
         }
-
-        const body = generalLib.omit(data, 'confirmPassword')
-
-        // console.log(body)
-        
+        const body = generalLib.omit(data, 'confirmPassword')        
         // Request Updata to central
         const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
-
-        console.log('respone', updateUser.data)
-        
         // Add activity 
         if(updateUser && updateUser.data.data != undefined){
             const actData = updateUser.data.data
