@@ -215,7 +215,6 @@ module.exports = function (app) {
     ],async (req, res) => {
         var data = req.body
         const me = req.me
-    
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null  
 
         // Check Validate 
@@ -234,37 +233,55 @@ module.exports = function (app) {
         data['password'] = await passwordLib.hash(data.password);
         data.last_user_agent = req.headers["user-agent"];
         data.last_ip = generalLib.getIp(req);
-        
+         
+
+
+
+        if(['sub_admin', 'staff'].includes(data.role)){
+            if(!data.port) return res.status(403).send({'message': `Port is required for role ${data.role}`})
+        } 
+
+        // Admin
         if(me.role=='admin'){
-            if(me.port==null){
-                if(['super_admin'].includes(data.role)) return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
-                if(data.role=='admin' && data.port==undefined) return res.status(403).send({'message': `Need port for role ${data.role} if user create by ${me.role} that has no port.`})
+            if(['super_admin'].includes(data.role)) return res.status(403).send({'message': `Role ${me.role} can not assign user ${data.role}.`})
+            if(me.port == null ){
+                if(data.role == 'admin' && data.port == undefined) return res.status(403).send({'message': `Admin has no port can assign only admin has port.`})
             }
-            if(['super_admin', 'admin'].includes(data.role)) return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
-            if(me.port) data.port = me.port
+            if(me.port){
+                if(['admin'].includes(data.role)) return res.status(403).send({'message': `Role ${me.role} can not assign user ${data.role}.`})
+            }
         }
 
+        // Sub Admin
         if(me.role=='sub_admin'){
-            if(['super_admin', 'admin', 'sub_admin'].includes(data.role)) return res.status(403).send(`Role ${data.role} can not assign by ${me.role}.`)
+            if(['super_admin', 'admin', 'sub_admin'].includes(data.role)) return res.status(403).send({'message': `Role ${data.role} can not assign by ${me.role}.`})
             if(me.port) data.port = me.port
         }
-        
+     
         const body = generalLib.omit(data, 'confirmPassword')
+
+        console.log(body)
+
+
+        // return 
+
+
+ 
         // Request To Createa User
         const addUser = await axios.post(config.centralUrl+'users/create', body)
+        // Add activity 
         if(addUser && addUser.data.data != undefined){
             const actData = addUser.data.data
             actData.logined_at = generalLib.formatDateTime(actData.logined_at)
             actData.created_at = generalLib.formatDateTime(actData.created_at)
             actData.updated_at = generalLib.formatDateTime(actData.updated_at)
             actData.logout_at = generalLib.formatDateTime(actData.logout_at)
-
-            if(!me.port) device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
+            const device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
             await activityLogModel.add({
                 id: generalLib.generateUUID(me.port),
                 uid: me.id, 
                 ip: generalLib.getIp(req), 
-                port: me.port ? me.port : device.port, 
+                port: device.port, 
                 record_id: data.uid,
                 ref_id: actData.username,
                 device_id: deviceId,
