@@ -128,9 +128,10 @@ module.exports = function(app) {
         }
     
         const xlsxUrl = config.baseUrl+config.xlsxDir+deviceId+'.xlsx'
+        const xlsxPath = config.xlsxDir+deviceId+'.xlsx'
         try {
             xlsx(data , settings)
-            return res.status(200).send({'url': xlsxUrl})
+            return res.status(200).send({'url': xlsxUrl, 'path': xlsxPath})
         } catch (error) {
             // console.log(error)
         }
