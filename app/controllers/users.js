@@ -35,7 +35,8 @@ module.exports = function(app){
         const id = req.params.id
         const body = req.body
         const userData = body
-        console.log(userData)
+        
+        console.log('update data', userData)
    
         try {
             await userModel.update(id, userData)
