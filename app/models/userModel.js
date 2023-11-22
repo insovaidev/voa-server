@@ -93,11 +93,6 @@ module.exports = {
         // Where condition
         if(filters){
             if(filters.sid) q.where('s.sid', '>', filters.sid)  
-            if(filters.ports){
-                const tuple = `('${filters.ports.join("','")}')`;
-                q.whereRaw('u.port'+' IN '+ tuple)        
-            }  
-            if(filters.no_port && filters.no_port == 1) q.whereNull('u.port')
         }
 
         // Return 
@@ -157,7 +152,6 @@ module.exports = {
     },
 
     updateSync: async function(data){
-        console.log('updateSYnc Data', data)
         const body = generalLib.omit(data, 'uid', 'last_user_agent', 'last_ip', 'logout_at', 'logined_at')        
         body.created_at = generalLib.formatDateTime(data.created_at)
         body.updated_at = generalLib.formatDateTime(data.updated_at)

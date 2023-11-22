@@ -332,7 +332,7 @@ module.exports = function (app) {
         // Request Updata to central
         const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
 
-        console.log(updateUser.data)
+        console.log('respone', updateUser.data)
         
         // Add activity 
         if(updateUser && updateUser.data.data != undefined){
