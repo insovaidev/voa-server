@@ -15,19 +15,17 @@ const axios = require("axios");
 const config = require("../config/config");
 
 
-
 module.exports = function (app) {
-    
     // Check Auth
     app.use('/settings', checkAuth);
     
     // History Lists
     app.get('/settings/histories', async ( req, res ) => {
-
         let data = []
         let total = 0
         let report_time_zone = 0
         let filters = Object.assign({}, req.query) 
+        filters.limit = 30
         const me = req.me
 
         if(me.port) {
@@ -40,7 +38,6 @@ module.exports = function (app) {
         if(me.role == 'report' || me.role == 'staff') filters.uid = me.id
 
         const h = report_time_zone.toString().replace('-','')
-
         if(start_date = req.query.start_date) filters.start_date = generalLib.dateTime({setDate: start_date, addHour: report_time_zone < 0 ? h : null, minusHour: report_time_zone > 0 ? h : null})
         if(end_date = req.query.end_date) filters.end_date = generalLib.dateTime({setDate: end_date, isEndDate: true, addHour: report_time_zone < 0 ? h : null, minusHour: report_time_zone > 0 ? h : null})
         
@@ -51,19 +48,12 @@ module.exports = function (app) {
             }
         }
 
-        if(limit = req.query.limit){
-            filters.limit = limit 
-        }  else {
-            filters.limit = 30    
-        }
-
         if(offset = req.query.offset) {
             filters.offset = offset 
         } else {
             filters.offset = 0
         }
 
-       
         const select = 'bin_to_uuid(a.id) id, bin_to_uuid(a.uid) as uid, a.description, a.record_type, a.action, a.port, a.created_at, bin_to_uuid(a.record_id) as record_id, u.username'
         
         if(result=await activityLogModel.list({select: select, filters:filters})){
@@ -576,5 +566,4 @@ module.exports = function (app) {
         return res.status(404).send({'message': 'User Not Found'})
     })
 }
-
 
