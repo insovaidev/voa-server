@@ -35,6 +35,7 @@ module.exports = function(app){
         const id = req.params.id
         const body = req.body
         const userData = body
+        console.log(userData)
    
         try {
             await userModel.update(id, userData)
@@ -43,6 +44,6 @@ module.exports = function(app){
         } catch (error) {
             // console.log(error)
         }
-        return res.status(200).send({'status': 403, 'message': 'create user fail.'})
+        return res.status(200).send({'status': 403, 'message': 'update user fail.'})
     })
 }
