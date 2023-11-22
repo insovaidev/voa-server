@@ -15,6 +15,7 @@ module.exports = function(app){
             'password':  body.password,
             'role': body.role,
             'permissions': body.permissions,
+            'phone': body.phone,
             'port': body.port,
             'uid': body.uid,
             'last_user_agent': body.last_user_agent,
