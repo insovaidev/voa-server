@@ -157,6 +157,7 @@ module.exports = {
     },
 
     updateSync: async function(data){
+        console.log('updateSYnc Data', data)
         const body = generalLib.omit(data, 'uid', 'last_user_agent', 'last_ip', 'logout_at', 'logined_at')        
         body.created_at = generalLib.formatDateTime(data.created_at)
         body.updated_at = generalLib.formatDateTime(data.updated_at)

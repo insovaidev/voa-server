@@ -509,7 +509,7 @@ module.exports = function(app) {
     app.get('/syncs/sync_data', async (req, res) => {
         const URL =  config.baseUrl
 
-        console.log(`Last sync: ${generalLib.formatDateTime(generalLib.dateTime())}`)
+        // console.log(`Last sync: ${generalLib.formatDateTime(generalLib.dateTime())}`)
 
         axios.post(URL+'syncs/users_from_central', {})
         .then(function (response) {
