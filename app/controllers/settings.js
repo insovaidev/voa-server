@@ -286,9 +286,10 @@ module.exports = function (app) {
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null  
 
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})  
-   
-        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not update a user.`})
 
+        // Not allowed update user    
+        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not update a user.`})
+        // Get user
         if(!(result=await userModel.get({select: 'username, port, role', filters: { uid: req.params.id}}))) return res.status(404).send({'message':'User not found.'})
         // Super Admin
         if(me.role == 'super_admin'){
@@ -325,20 +326,23 @@ module.exports = function (app) {
         }
 
         const body = generalLib.omit(data, 'confirmPassword')
+        
+        // Request Updata to central
         const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
+        
+        // Add activity 
         if(updateUser && updateUser.data.data != undefined){
             const actData = updateUser.data.data
             actData.logined_at = generalLib.formatDateTime(actData.logined_at)
             actData.created_at = generalLib.formatDateTime(actData.created_at)
             actData.updated_at = generalLib.formatDateTime(actData.updated_at)
             actData.logout_at = generalLib.formatDateTime(actData.logout_at)
-
-            if(!me.port) device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
+            const device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
             await activityLogModel.add({
                 id: generalLib.generateUUID(me.port),
                 uid: me.id, 
                 ip: generalLib.getIp(req), 
-                port: me.port ? me.port : device.port, 
+                port: device.port, 
                 record_id: req.params.id,
                 ref_id: actData.username,
                 device_id: deviceId,
@@ -348,6 +352,7 @@ module.exports = function (app) {
             })
             return res.status(201).send({'message': 'success'})
         } 
+
         const status = updateUser.data.status
         if(status == 422) return res.status(422).send({'message': updateUser.data.message})
         if(status == 403) return res.status(403).send({'message': updateUser.data.message})
