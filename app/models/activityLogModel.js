@@ -119,12 +119,10 @@ module.exports = {
         // Return Result
         const result = await q
         return result && result.length ? result : null
-    
     },
 
     filters: function(q, filters=null) {
         if(filters) {
-            // Where Condition
             if(filters.today) q.where('a.created_at', '>=', filters.today.start_date)
             if(filters.today) q.where('a.created_at', '<=', filters.today.end_date)
             if(filters.start_date) q.where('a.created_at', '>=', filters.start_date)
@@ -135,7 +133,6 @@ module.exports = {
             if(filters.id) q.whereRaw('a.id = uuid_to_bin('+"'"+filters.id+"'"+')')
             if(filters.record_id) q.whereRaw('a.record_id = uuid_to_bin('+"'"+filters.record_id+"'"+')')
             if(filters.record_type) q.where('a.record_type', filters.record_type)
-
         }
     }    
 }
