@@ -70,7 +70,6 @@ module.exports = {
 
 
     excelList: async function({select=null, groupBy=null, filters}={}) {
-
         const q = db(table+ ' as v')
 
         // Select Fields

@@ -80,7 +80,7 @@ module.exports = function(app) {
             ])
         }
 
-        const excelFilePath = config.xlsxDir+deviceId
+        const xlsxPath = config.xlsxDir+deviceId
 
         if(reportList==null) return res.status(422).send({'message': "Data of report is null."})
         // Add key no: 1
@@ -120,7 +120,7 @@ module.exports = function(app) {
         ]
 
         let settings = {
-            fileName: excelFilePath,
+            fileName: xlsxPath,
             extraLength: 3,
             writeMode: "WriteFile",
             writeOptions: {},
@@ -128,10 +128,10 @@ module.exports = function(app) {
         }
     
         const xlsxUrl = config.baseUrl+config.xlsxDir+deviceId+'.xlsx'
-        const xlsxPath = config.xlsxDir+deviceId+'.xlsx'
+
         try {
             xlsx(data , settings)
-            return res.status(200).send({'url': xlsxUrl, 'path': xlsxPath})
+            return res.status(200).send({'url': xlsxUrl, 'path': xlsxPath+'.xlsx'})
         } catch (error) {
             // console.log(error)
         }

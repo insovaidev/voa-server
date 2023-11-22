@@ -23,6 +23,7 @@ app.use(express.static('public'))
 // Public Folder
 app.use('/tmp', express.static('tmp'))
 app.use('/pdf', express.static('pdf'))
+app.use('/xlsx', express.static('xlsx'))
 app.use('/uploads', express.static('uploads'))
 
 // Configuration
