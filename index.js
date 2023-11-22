@@ -29,6 +29,7 @@ app.use('/uploads', express.static('uploads'))
 // Configuration
 const config = require('./app/config/config')
 
+// Testing code 
 cron.schedule('*/10 * * * * *', () => {
   axios.get(`${process.env.CRON_URL}`)
 });

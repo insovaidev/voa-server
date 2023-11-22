@@ -63,7 +63,6 @@ module.exports = function(app) {
         }
         if(result = await reportModel.total({select: 'v.sex', groupBy: 'bin_to_uuid(v.vid)', filters: filters})) {
             total = result.length
-            let id = 1
             result.forEach(val => {
                 val.dob = generalLib.formatDate(val.dob)
                 delete val.total;

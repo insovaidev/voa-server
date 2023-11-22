@@ -1,6 +1,5 @@
-# Sync data:
-- users to local(sub server) user no port and user match port that server allowed.
-
-# issued:
-- should fetch all port by published = 1
-
+# To Run 
+    - npm i 
+    - Rename file 'example.sync_logs' to 'sync_logs'
+    - Rename file 'example.env' to '.env'
+         
