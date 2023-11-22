@@ -282,27 +282,36 @@ module.exports = function (app) {
     // Update a User
     app.patch('/settings/users/:id', async (req, res ) => {
         var data = req.body
-        const me = req.me
+        const me = req.me 
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null  
 
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})  
    
         if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not update a user.`})
 
-        if(!(result=await userModel.get({select: 'username', filters: { uid: req.params.id}}))) return res.status(404).send({'message':'User not found.'})
-        
+        if(!(result=await userModel.get({select: 'username, port, role', filters: { uid: req.params.id}}))) return res.status(404).send({'message':'User not found.'})
+        // Super Admin
         if(me.role == 'super_admin'){
-            if(data.port==undefined) return res.send({'message': 'For super_admin when update any user must be assign port.'})
+            if(!(['admin', 'report'].includes(result.role))) {
+                if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
+            }
         }
-
+        // Admin
         if(me.role=='admin'){
             if(data.role && ['super_admin'].includes(data.role)) return res.send({'message': `As admin can not assign user to role super_admin.`})
+            // Admin no port
             if(me.port==null){
-                if(data.port==undefined) return res.send({'message': 'For admin that has no port when update any user must be assign port.'})   
+                if(!(['report'].includes(result.role))) {
+                    if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
+                }
             }
-            if(me.port && data.port && me.port!==data.port) return res.status(403).send({'message': `This Admin can only assign user to port ${me.port}.`})
+            // Admin has port
+            if(me.port) {
+                if(!data.port || data.port != me.port) return res.status(403).send({'message': `This Admin can only assign user to port ${me.port}.`})
+            }
         }
     
+        // Sub Admin
         if(me.role=='sub_admin'){
             if(data.role){
                 if(['super_admin', 'admin', 'sub_admin'].includes(data.role)) return res.status(403).send({'message': `As sub_admin can not assign user to role ${data.role}.`})
@@ -314,6 +323,7 @@ module.exports = function (app) {
             if(data.password != data.confirmPassword) return res.status(403).send({'message': 'comfirmPassword not match.'})
             data.password = await passwordLib.hash(data.password)
         }
+
         const body = generalLib.omit(data, 'confirmPassword')
         const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
         if(updateUser && updateUser.data.data != undefined){
