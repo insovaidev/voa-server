@@ -80,7 +80,7 @@ module.exports = function(app) {
             ])
         }
 
-        const excelFilePath = config.pdfDir+deviceId
+        const excelFilePath = config.xlsxDir+deviceId
 
         if(reportList==null) return res.status(422).send({'message': "Data of report is null."})
         // Add key no: 1
@@ -95,7 +95,7 @@ module.exports = function(app) {
 
         // Create Dir
         var dist = ""
-        config.pdfDir.split('/').forEach(v => {
+        config.xlsxDir.split('/').forEach(v => {
             if(v.indexOf(".") < 0) {
                 dist += "/"+v
                 if (!fs.existsSync("."+dist)) fs.mkdirSync("."+dist)
@@ -127,7 +127,7 @@ module.exports = function(app) {
             RTL: false,
         }
     
-        const xlsxUrl = config.baseUrl+config.pdfDir+deviceId+'.xlsx'
+        const xlsxUrl = config.baseUrl+config.xlsxDir+deviceId+'.xlsx'
         try {
             xlsx(data , settings)
             return res.status(200).send({'url': xlsxUrl})

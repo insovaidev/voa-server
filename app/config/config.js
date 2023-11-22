@@ -25,6 +25,7 @@ module.exports = {
     tmpDir: 'tmp/',
     uploadDir: 'uploads/',
     pdfDir: 'pdf/',
+    xlsxDir: 'xlsx/',
     allowMimeTypes: ['image/jpeg','image/png'],
     allowExtension: ['jpg','jpeg','png'],
 
