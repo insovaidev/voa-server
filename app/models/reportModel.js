@@ -63,7 +63,6 @@ module.exports = {
             }
         }
 
-
         // Return Result
         const result = await q
         return result && result.length ? result : null
@@ -93,7 +92,6 @@ module.exports = {
                 q.orderBy(filters.sort && filters.sort != undefined ? 'v.'+filters.sort : 'v.created_at', filters.sort_value && filters.sort_value != undefined ? filters.sort_value : 'desc' )
             }
         }
-
 
         // Return Result
         const result = await q

@@ -13,7 +13,7 @@ module.exports = function(app) {
     // Apply authentication
     app.use('/excel', checkAuth)
 
-    // exel
+    // Excel
     app.post('/excel/name', async (req, res) => {
         let deleted = 0
         let total = 0
@@ -24,8 +24,8 @@ module.exports = function(app) {
         filters.deleted = '0'
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null 
         
-         // Role and Permission
-         if(me.role=='staff'){
+        // Role and Permission
+        if(me.role=='staff'){
             if(user=await userModel.get({ select: 'permissions', filters: { uid: me.id }})){
                 let perms=[]
                 if(!user.permissions) return res.status(403).send({'message':'The user does not have permission to request data.'})
