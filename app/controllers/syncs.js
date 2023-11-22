@@ -26,7 +26,7 @@ module.exports = function(app) {
     // SUB SERVER CALL
     app.post('/syncs/users_from_central', async (req, res, next) => {      
         var sync_logs = {}
-        if(result = fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
+        if(result = await fs.readFileSync('sync_logs')) sync_logs = JSON.parse(result)
         var sid = sync_logs.users != undefined ? sync_logs.users : 0
         
         try {    
