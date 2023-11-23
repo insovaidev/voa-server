@@ -224,7 +224,7 @@ module.exports = function (app) {
         // Role and Permission
         if (me.role == 'report' || me.role == 'staff' ) return res.status(403).send({'message': `Role ${me.role} can not add a user to the system.`})
         
-        // Check duplicate user
+        // Check Duplicate User
         if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
             return res.status(403).send({'code': 'invalid_username', 'type': 'users', 'message': 'Sorry! The username you provid already exist.'})
         } 
@@ -247,7 +247,7 @@ module.exports = function (app) {
             }
             if(me.port){
                 if(['admin'].includes(data.role)) return res.status(403).send({'message': `Role ${me.role} can not assign user ${data.role}.`})
-                if(data.role == 'report' && data.port == undefined) return res.status(403).send({'message': `Admin ${me.port} can assign only report has port ${me.port}.`})
+                if(data.role == 'report' && data.port == undefined) return res.status(403).send({'message': `Admin port ${me.port} can assign only report has port ${me.port}.`})
             }
         }
 
