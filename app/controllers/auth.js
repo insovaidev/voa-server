@@ -133,7 +133,7 @@ module.exports = function(app) {
     app.post('/auth/logout', async (req, res) => {
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null      
         const device = await deviceModel.get({filters: {'device_id': deviceId}})
-        if(!device) return res.status(404).send({'message': 'device id not found.'})  
+        if(!device) return res.status(404).send({'message': 'Device not found.'})  
         if(device.status==0) return res.status(403).send({'message': lang.deviceBanned})
         const result = await tokenLib.remove(req)
         if(result.status == 200) {
@@ -148,8 +148,8 @@ module.exports = function(app) {
             data_json.updated_at = generalLib.formatDateTime(data_json.updated_at)
             data_json.logout_at = generalLib.formatDateTime(data_json.logout_at)
 
-            // Add Log
             try {
+                // Add activity
                 await activityLogModel.add({
                     'id': generalLib.generateUUID(),
                     'port': device.port,
@@ -168,6 +168,7 @@ module.exports = function(app) {
                         if (err) throw err;
                     });
                 }
+             
                 // Delete xlsx
                 if(fs.existsSync(config.xlsxDir+deviceId+'.xlsx')){
                     fs.unlink(config.xlsxDir+deviceId+'.xlsx', (err) => {
@@ -178,7 +179,6 @@ module.exports = function(app) {
             } catch (error) {
                 return res.status(500).send({'message': 'Internal Server Error.'})
             }
-            
         }
         res.status(result.status).send({'message': result.message})
     })

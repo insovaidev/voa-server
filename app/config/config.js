@@ -18,10 +18,12 @@ module.exports = {
         'email': 'voa-644dd10c@immigration.gov.kh',
         'post_key': 'cUEdst254cRWsLgQGEwA',
     },
-
+    
+    // URL
+    baseUrl: process.env.BASEURL, // URL this server running
+    centralUrl: process.env.CENTRAL_URL,  // URL central server(if this server is a central server the URL will be the same).
+    
     // For File Upload
-    baseUrl: process.env.BASEURL, // URL this server installed
-    centralUrl: process.env.CENTRAL_URL,  // URL central server. Noted: if this server is a central server the URL will be the same.
     tmpDir: 'tmp/',
     uploadDir: 'uploads/',
     pdfDir: 'pdf/',

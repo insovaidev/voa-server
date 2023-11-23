@@ -222,7 +222,7 @@ module.exports = function (app) {
         if (!errors.isEmpty()) return res.status(422).json(generalLib.formErrors(errors.array()))
 
         // Role and Permission
-        if (me.role == 'report' || me.role == 'staff' ) return res.status(403).send({'message': `Role ${me.role} can not add a user to this system.`})
+        if (me.role == 'report' || me.role == 'staff' ) return res.status(403).send({'message': `Role ${me.role} can not add a user to the system.`})
         
         // Check duplicate user
         if(result=await userModel.get({select:'username', filters: { username: data.username }})) {
@@ -235,7 +235,7 @@ module.exports = function (app) {
         data.last_ip = generalLib.getIp(req);
          
         if(['sub_admin', 'staff'].includes(data.role)){
-            if(!data.port) return res.status(403).send({'message': `Port is required for role ${data.role}`})
+            if(!data.port) return res.status(403).send({'message': `Port is required for role ${data.role}.`})
         } 
 
         // Admin
@@ -246,6 +246,7 @@ module.exports = function (app) {
             }
             if(me.port){
                 if(['admin'].includes(data.role)) return res.status(403).send({'message': `Role ${me.role} can not assign user ${data.role}.`})
+                if(data.role == 'report' && data.port == undefined) return res.status(403).send({'message': `Admin ${me.port} can assign only report has port ${me.port}.`})
             }
         }
 
