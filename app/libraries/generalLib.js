@@ -80,7 +80,8 @@ module.exports = {
         }
         return null
     },
-
+    
+    // Get ip from request
     getIp: function(req) {
         return req.ip.replace('::ffff:','')
     },
@@ -124,10 +125,13 @@ module.exports = {
     strToUUID: function (str) {
         return uuid.v5(str, uuid.v5.URL)
     },
+
+    // Validate uuid
     uuidValidate: function(str){
         return uuid.validate(str)
     },
 
+    // Format milli to minute:second mm:ss
     millisToMinutesAndSeconds: function (millis) {
         var minutes = Math.floor(millis / 60000);
         var seconds = ((millis % 60000) / 1000).toFixed(0);
