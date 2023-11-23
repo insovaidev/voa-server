@@ -33,7 +33,7 @@ module.exports = function(app) {
             const attempts = await attemptModel.gets({select: 'created_at', filters: {'user': body.username}})
            
             if(attempts && attempts.length > 4){
-                var nowToLastAtt = new Date() - attempts[0]['created_at']
+                var nowToLastAtt = new Date() - attempts[0]['created_at'] // Time from last attempt till now.
                 var waitTime = generalLib.millisToMinutesAndSeconds(300000 - nowToLastAtt) 
                 if(nowToLastAtt < 300000){
                     return res.status(403).send({'message': `Wait ${waitTime} bofore try login again!` })
@@ -48,9 +48,9 @@ module.exports = function(app) {
                     await attemptModel.add(data)
                 }
             }
-
-            const user = await userModel.get({select: select, filters: {'username': body.username}})
             
+            // Check User
+            const user = await userModel.get({select: select, filters: {'username': body.username}})
             if(!user) {
                 // Add Login Attempt
                 const data = {}
@@ -63,11 +63,10 @@ module.exports = function(app) {
                 await attemptModel.add(data)
                 return res.status(422).send({'type':'user', 'code':'no_found', 'message':lang.userNoFound, 'errors': {'username':{'message':lang.userNoFound}}})
             }
-        
             if(user.banned == 1) return res.status(403).send({'type':'user', 'code':'banned', 'message': lang.userBanned})
 
-            // Match User Port and device port
-            if(user && user.port){
+            // Check User and Device
+            if(user && user.port){ 
                 if(device && device.port != user.port) return res.status(403).send({'message': `User port ${user.port} and device port ${device.port} not match.`})
             }
             
@@ -103,8 +102,7 @@ module.exports = function(app) {
 
             const actBody = {}
             actBody.id = generalLib.generateUUID()
-
-            actBody.port = data.port
+            actBody.port = device.port
             actBody.uid = user.uid
             actBody.ip = generalLib.getIp(req)
             actBody.record_id = data.id
@@ -122,7 +120,7 @@ module.exports = function(app) {
             // Generate token
             const tokens = await tokenLib.generate(req, user, deviceId)
             
-            // Delete User Attempt 
+            // Delete User Attempts 
             await attemptModel.delete({filters: { user: body.username}})
             
             // Update User in device table
@@ -154,7 +152,7 @@ module.exports = function(app) {
             try {
                 await activityLogModel.add({
                     'id': generalLib.generateUUID(),
-                    'port': user.port ? user.port : device.port,
+                    'port': device.port,
                     'ip': generalLib.getIp(req),
                     'ref_id': user.username,
                     'record_id': result.payload.sub,
