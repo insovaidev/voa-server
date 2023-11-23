@@ -451,7 +451,7 @@ module.exports = function (app) {
             // Admin no port
             if(me.port==null){
                 if(!(['report'].includes(result.role))) {
-                    if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
+                    if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Admin has no port can only update Admin has port.`})
                 }
                 data.port = data.port ? data.port : null
             }
