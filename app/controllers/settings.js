@@ -234,9 +234,6 @@ module.exports = function (app) {
         data.last_user_agent = req.headers["user-agent"];
         data.last_ip = generalLib.getIp(req);
          
-
-
-
         if(['sub_admin', 'staff'].includes(data.role)){
             if(!data.port) return res.status(403).send({'message': `Port is required for role ${data.role}`})
         } 
@@ -260,13 +257,6 @@ module.exports = function (app) {
      
         const body = generalLib.omit(data, 'confirmPassword')
 
-        console.log(body)
-
-
-        // return 
-
-
- 
         // Request To Createa User
         const addUser = await axios.post(config.centralUrl+'users/create', body)
         // Add activity 

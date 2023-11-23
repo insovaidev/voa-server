@@ -1,6 +1,5 @@
 // Set Default Timezone
 process.env.TZ = 'Asia/Phnom_Penh'
-
 const express = require('express')
 const app = express()
 const cors = require('cors')
@@ -20,6 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-
 
 // Enable public resource
 app.use(express.static('public'))
+
 // Public Folder
 app.use('/tmp', express.static('tmp'))
 app.use('/pdf', express.static('pdf'))
