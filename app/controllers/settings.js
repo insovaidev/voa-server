@@ -441,9 +441,9 @@ module.exports = function (app) {
         if(!(result=await userModel.get({select: 'username, port, role', filters: { uid: req.params.id}}))) return res.status(404).send({'message':'User not found.'})
         
         // Deplicate Users 
-        if(data.username){
-            if(exist= await userModel.get({filters: {'username': data.username}})) return res.status(403).send({'message':'Username already exist.'})
-        }
+        // if(data.username){
+        //     if(exist= await userModel.get({filters: {'username': data.username}})) return res.status(403).send({'message':'Username already exist.'})
+        // }
         
         // Super Admin
         if(me.role == 'super_admin'){
