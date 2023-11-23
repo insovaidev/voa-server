@@ -106,13 +106,26 @@ module.exports = {
         if(filters) {    
             if(filters.username) q.where('username', 'like' ,`%${filters.username}%`)
             if(filters.uid) q.whereRaw('uid = uuid_to_bin('+"'"+filters.uid+"'"+')')
-            if(filters.port) q.where('port', filters.port)
             if(filters.not_role) q.whereNotIn('role', filters.not_role)
+            if(filters.port) q.where('port', filters.port)
             if(filters.sex) q.where('sex', filters.sex)
             // when get histories
             if(filters.in_role) q.whereIn('role', filters.in_role)
             if(filters.role) q.where('role', filters.role)
             if(filters.not_port && filters.not_port == 1) q.whereRaw('port IS NOT NULL')
+            // filter for admin 
+            if(filters.admin_has_port == 0){
+                q.whereRaw(`(role = 'admin' AND port IS NOT NULL) OR role in ('report', 'staff', 'sub_admin')`);
+                if(filters.role) q.where('role', filters.role)
+                if(filters.port) q.where('port', filters.port)
+                if(filters.sex) q.where('sex', filters.sex)
+            }
+            if(filters.admin_has_port == 1){
+                q.whereRaw(`role in ('report', 'staff', 'sub_admin')`)
+                if(filters.role) q.where('role', filters.role)
+                if(filters.port) q.where('port', filters.port)
+                if(filters.sex) q.where('sex', filters.sex)
+            }
         }
     },
 

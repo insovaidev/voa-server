@@ -300,15 +300,16 @@ module.exports = function (app) {
         
         var select = 'bin_to_uuid(uid) as uid, name, username, phone, email, sex, created_at, role, port, banned, banned_reason, permissions'
         
+        // me.port = "PHN"
+        
         if(me.role=='admin'){
             if(me.port==null){
-                filters.not_role = ['super_admin']
-                filters.not_port = 1                     
+                filters.admin_has_port = 0
             }
 
             if(me.port){
+                filters.admin_has_port = 1
                 filters.port = me.port    
-                filters.not_role = ['super_admin', 'admin']        
             } 
         }
     
@@ -432,12 +433,18 @@ module.exports = function (app) {
         const me = req.me 
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null  
 
-        if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})  
+        if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'Params uuid invalid.'})  
 
         // Not allowed update user    
         if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not update a user.`})
         // Get user
         if(!(result=await userModel.get({select: 'username, port, role', filters: { uid: req.params.id}}))) return res.status(404).send({'message':'User not found.'})
+        
+        // Deplicate Users 
+        if(data.username){
+            if(exist= await userModel.get({filters: {'username': data.username}})) return res.status(403).send({'message':'Username already exist.'})
+        }
+        
         // Super Admin
         if(me.role == 'super_admin'){
             if(!(['admin', 'report'].includes(result.role))) {
