@@ -577,4 +577,3 @@ module.exports = function (app) {
         return res.status(404).send({'message': 'User Not Found'})
     })
 }
-
