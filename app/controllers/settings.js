@@ -355,6 +355,7 @@ module.exports = function (app) {
         const me = req.me
         const updateData = {}
         let action = null
+        let statusMsg = 'Updated successfully'
         const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null  
 
         if(data.username){
@@ -389,6 +390,7 @@ module.exports = function (app) {
             if(data.password != data.confirmPassword) return res.status(403).send({'message': 'comfirmPassword not match.'})
             updateData.password = await passwordLib.hash(data.password)
             action = 'change_password'
+            statusMsg = 'Password change successfully' 
         }
 
         // Update User
@@ -424,7 +426,7 @@ module.exports = function (app) {
                 }) 
             }
         }
-        return res.send({'message': 'updated profile'})
+        return res.send({'message': statusMsg })
     })
     
     // Update a User
@@ -504,13 +506,13 @@ module.exports = function (app) {
                 action: 'edit', 
                 data: JSON.stringify(actData)
             })
-            return res.status(201).send({'message': 'success'})
+            return res.status(201).send({'message': 'Updated successfully'})
         } 
 
         const status = updateUser.data.status
         if(status == 422) return res.status(422).send({'message': updateUser.data.message})
         if(status == 403) return res.status(403).send({'message': updateUser.data.message})
-        res.send({'message': 'updated success'})
+        res.send({'message': 'Updated successfully'})
     })
 
     // Get a User
