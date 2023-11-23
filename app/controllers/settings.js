@@ -234,6 +234,7 @@ module.exports = function (app) {
         data.last_user_agent = req.headers["user-agent"];
         data.last_ip = generalLib.getIp(req);
          
+
         if(['sub_admin', 'staff'].includes(data.role)){
             if(!data.port) return res.status(403).send({'message': `Port is required for role ${data.role}.`})
         } 
@@ -557,12 +558,12 @@ module.exports = function (app) {
             data_json.created_at = generalLib.formatDateTime(data_json.created_at)
             data_json.updated_at = generalLib.formatDateTime(data_json.updated_at)
             data_json.logout_at = generalLib.formatDateTime(data_json.logout_at)
-            if(!me.port) device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
+            const device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
             await activityLogModel.add({
-                id: generalLib.generateUUID(me.port ? me.port : ''),
+                id: generalLib.generateUUID(device.port),
                 uid: me.id, 
                 ip: generalLib.getIp(req), 
-                port: me.port ? me.port : device.port,
+                port: device.port,
                 record_id: req.params.id, 
                 device_id: deviceId,
                 ref_id: user.username,
