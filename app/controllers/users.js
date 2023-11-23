@@ -9,17 +9,23 @@ module.exports = function(app){
             return res.status(200).send({'status': 422, 'message': 'username already exist.'})
         } 
         const userData = {
-            'username': body.username,
+            'uid': body.uid,
             'name': body.name,
+            'username': body.username,
             'sex': body.sex,
-            'password':  body.password,
+            'phone': body.phone,
+            'email': body.email,
             'role': body.role,
             'permissions': body.permissions,
-            'phone': body.phone,
             'port': body.port,
-            'uid': body.uid,
-            'last_user_agent': body.last_user_agent,
-            'last_ip': body.last_ip,
+            'photo': body.photo,
+            'banned': body.banned,
+            'banned_reason': body.banned_reason,
+            'password':  body.password,
+            'logined_at':  body.logined_at,
+            'logout_at':  body.logout_at,
+            'last_ip':  body.last_ip,
+            'last_user_agent':  body.last_user_agent,
         }
         
         try {
