@@ -288,84 +288,64 @@ module.exports = function (app) {
         if(status == 403) return res.status(403).send({'message': addUser.data.message})
     })
 
-    // Update a User
-    app.patch('/settings/users/:id', async (req, res ) => {
-        var data = req.body
-        const me = req.me 
-        const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null  
+    // Users Lists
+    app.get('/settings/users', async (req, res) => {
+        var total = 0
+        let data = []
+        const me = req.me
+        const filters = Object.assign({}, req.query)
 
-        if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})  
-
-        // Not allowed update user    
-        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not update a user.`})
-        // Get user
-        if(!(result=await userModel.get({select: 'username, port, role', filters: { uid: req.params.id}}))) return res.status(404).send({'message':'User not found.'})
-        // Super Admin
-        if(me.role == 'super_admin'){
-            if(!(['admin', 'report'].includes(result.role))) {
-                if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
-            }
-            data.port = data.port ? data.port : null
-        }
-        // Admin
+        // Not Allowed
+        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not get users.`})
+        
+        var select = 'bin_to_uuid(uid) as uid, name, username, phone, email, sex, created_at, role, port, banned, banned_reason, permissions'
+        
         if(me.role=='admin'){
-            if(data.role && ['super_admin'].includes(data.role)) return res.send({'message': `As admin can not assign user to role super_admin.`})
-            // Admin no port
             if(me.port==null){
-                if(!(['report'].includes(result.role))) {
-                    if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
-                }
-                data.port = data.port ? data.port : null
+                filters.not_role = ['super_admin']
+                filters.not_port = 1                     
             }
-            // Admin has port
-            if(me.port) {
-                if(!data.port || data.port != me.port) return res.status(403).send({'message': `This Admin can only assign user to port ${me.port}.`})
-            }
+
+            if(me.port){
+                filters.port = me.port    
+                filters.not_role = ['super_admin', 'admin']        
+            } 
         }
     
-        // Sub Admin
         if(me.role=='sub_admin'){
-            if(data.role){
-                if(['super_admin', 'admin', 'sub_admin'].includes(data.role)) return res.status(403).send({'message': `As sub_admin can not assign user to role ${data.role}.`})
-            }
-            if(data.port && me.port!==data.port) return res.send({'message': `This user can only assign to port ${me.port}.`})
+            filters.port = me.port
+            filters.not_role = ['super_admin', 'admin', 'sub_admin']
         }
 
-        if(data.password){
-            if(data.password != data.confirmPassword) return res.status(403).send({'message': 'comfirmPassword not match.'})
-            data.password = await passwordLib.hash(data.password)
+        if(limit = req.query.limit){
+            filters.limit = limit 
+        }  else {
+            filters.limit = 30    
         }
-        const body = generalLib.omit(data, 'confirmPassword')     
+
+        if(offset = req.query.offset) {
+            filters.offset = offset 
+        } else {
+            filters.offset = 0
+        }
     
-        // Request Updata to central
-        const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
-        // Add activity 
-        if(updateUser && updateUser.data.data != undefined){
-            const actData = updateUser.data.data
-            actData.logined_at = generalLib.formatDateTime(actData.logined_at)
-            actData.created_at = generalLib.formatDateTime(actData.created_at)
-            actData.updated_at = generalLib.formatDateTime(actData.updated_at)
-            actData.logout_at = generalLib.formatDateTime(actData.logout_at)
-            const device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
-            await activityLogModel.add({
-                id: generalLib.generateUUID(me.port),
-                uid: me.id, 
-                ip: generalLib.getIp(req), 
-                port: device.port, 
-                record_id: req.params.id,
-                ref_id: actData.username,
-                device_id: deviceId,
-                record_type: 'users', 
-                action: 'edit', 
-                data: JSON.stringify(actData)
-            })
-            return res.status(201).send({'message': 'success'})
-        } 
+        if(filters && filters.uid){
+            if(!generalLib.uuidValidate(filters.uid)) return res.status(422).send({'message': 'params uuid invalid.'})
+        }
 
-        const status = updateUser.data.status
-        if(status == 422) return res.status(422).send({'message': updateUser.data.message})
-        if(status == 403) return res.status(403).send({'message': updateUser.data.message})
-        res.send({'message': 'updated success'})
+        // List
+        if(result = await userModel.list({select: select, filters:filters})){
+            result.forEach(val => {
+                data.push({...val})
+            })
+        }
+        
+        // Total
+        if(result=await userModel.total({filters:filters})){
+            total = result[0].total
+        }
+    
+        res.send({'total': total, 'limit': 30 , 'offset': parseInt(filters.offset),  'data': data.length > 0 ? data : null})
     })
 
     // Update User Profile 
@@ -446,96 +426,97 @@ module.exports = function (app) {
         return res.send({'message': 'updated profile'})
     })
     
-    // Users Lists
-    app.get('/settings/users', async (req, res) => {
-        var total = 0
-        let data = []
-        const me = req.me
-        const filters = Object.assign({}, req.query)
+    // Update a User
+    app.patch('/settings/users/:id', async (req, res ) => {
+        var data = req.body
+        const me = req.me 
+        const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null  
 
-        // Not Allowed
-        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not get users.`})
-        
-        var select = 'bin_to_uuid(uid) as uid, name, username, phone, email, sex, created_at, role, port, banned, banned_reason, permissions'
-        
-        if(me.role=='admin'){
-            if(me.port==null){
-                filters.not_role = ['super_admin']
-                filters.not_port = 1                     
+        if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})  
+
+        // Not allowed update user    
+        if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not update a user.`})
+        // Get user
+        if(!(result=await userModel.get({select: 'username, port, role', filters: { uid: req.params.id}}))) return res.status(404).send({'message':'User not found.'})
+        // Super Admin
+        if(me.role == 'super_admin'){
+            if(!(['admin', 'report'].includes(result.role))) {
+                if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
             }
-
-            if(me.port){
-                filters.port = me.port    
-                filters.not_role = ['super_admin', 'admin']        
-            } 
+            data.port = data.port ? data.port : null
+        }
+        // Admin
+        if(me.role=='admin'){
+            if(data.role && ['super_admin'].includes(data.role)) return res.send({'message': `As admin can not assign user to role super_admin.`})
+            // Admin no port
+            if(me.port==null){
+                if(!(['report'].includes(result.role))) {
+                    if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
+                }
+                data.port = data.port ? data.port : null
+            }
+            // Admin has port
+            if(me.port) {
+                if(!data.port || data.port != me.port) return res.status(403).send({'message': `This Admin can only assign user to port ${me.port}.`})
+            }
         }
     
+        // Sub Admin
         if(me.role=='sub_admin'){
-            filters.port = me.port
-            filters.not_role = ['super_admin', 'admin', 'sub_admin']
+            if(data.role){
+                if(['super_admin', 'admin', 'sub_admin'].includes(data.role)) return res.status(403).send({'message': `As sub_admin can not assign user to role ${data.role}.`})
+            }
+            if(data.port && me.port!==data.port) return res.send({'message': `This user can only assign to port ${me.port}.`})
         }
 
-        if(limit = req.query.limit){
-            filters.limit = limit 
-        }  else {
-            filters.limit = 30    
+        if(data.password){
+            if(data.password != data.confirmPassword) return res.status(403).send({'message': 'comfirmPassword not match.'})
+            data.password = await passwordLib.hash(data.password)
         }
-
-        if(offset = req.query.offset) {
-            filters.offset = offset 
-        } else {
-            filters.offset = 0
-        }
+        const body = generalLib.omit(data, 'confirmPassword')     
     
-        if(filters && filters.uid){
-            if(!generalLib.uuidValidate(filters.uid)) return res.status(422).send({'message': 'params uuid invalid.'})
-        }
-
-        // List
-        if(result = await userModel.list({select: select, filters:filters})){
-            result.forEach(val => {
-                data.push({...val})
+        // Request Updata to central
+        const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, body)
+        // Add activity 
+        if(updateUser && updateUser.data.data != undefined){
+            const actData = updateUser.data.data
+            actData.logined_at = generalLib.formatDateTime(actData.logined_at)
+            actData.created_at = generalLib.formatDateTime(actData.created_at)
+            actData.updated_at = generalLib.formatDateTime(actData.updated_at)
+            actData.logout_at = generalLib.formatDateTime(actData.logout_at)
+            const device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
+            await activityLogModel.add({
+                id: generalLib.generateUUID(me.port),
+                uid: me.id, 
+                ip: generalLib.getIp(req), 
+                port: device.port, 
+                record_id: req.params.id,
+                ref_id: actData.username,
+                device_id: deviceId,
+                record_type: 'users', 
+                action: 'edit', 
+                data: JSON.stringify(actData)
             })
-        }
-        
-        // Total
-        if(result=await userModel.total({filters:filters})){
-            total = result[0].total
-        }
-    
-        res.send({'total': total, 'limit': 30 , 'offset': parseInt(filters.offset),  'data': data.length > 0 ? data : null})
+            return res.status(201).send({'message': 'success'})
+        } 
+
+        const status = updateUser.data.status
+        if(status == 422) return res.status(422).send({'message': updateUser.data.message})
+        if(status == 403) return res.status(403).send({'message': updateUser.data.message})
+        res.send({'message': 'updated success'})
     })
 
     // Get a User
     app.get('/settings/users/:id', async (req, res ) => {
-        // const v = uuid.v5()
         const me = req.me    
         let data = null
-        var select = 'bin_to_uuid(uid) as uid, name, username, sex, phone, email, role, port, banned, banned_reason, permissions'
         const filters = { uid: req.params.id }
     
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})
         
         if(['report', 'staff'].includes(me.role)) return res.status(422).status(403).send({'message': `Role ${me.role} can not get a user.`})
 
-        if(me.role=='admin'){
-            if(me.port==null){
-                filters.is_port = 0
-                filters.not_role = ['super_admin']    
-            }
-
-            if(me.port){
-                filters.port = me.port    
-                filters.not_role = ['super_admin', 'admin']
-            }
-        }
-        
-        if(me.role=='sub_admin'){
-            filters.port = me.port
-            filters.not_role = ['super_admin', 'admin']
-        }
-
-        if(result = await userModel.get({select: select, filters: filters})){
+        if(result = await userModel.get({select: 'bin_to_uuid(uid) as uid, name, username, sex, phone, email, role, port, banned, banned_reason, permissions', filters: filters})){
             data = result
         } 
         
