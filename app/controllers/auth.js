@@ -162,18 +162,18 @@ module.exports = function(app) {
                     'record_type': 'users'
                 })
     
-                // Delete PDF File
+                // Delete pdf
                 if(fs.existsSync(config.pdfDir+deviceId+'.pdf')){
                     fs.unlink(config.pdfDir+deviceId+'.pdf', (err) => {
                         if (err) throw err;
                     });
                 }
-                if(fs.existsSync(config.pdfDir+deviceId+'.xlsx')){
-                    fs.unlink(config.pdfDir+deviceId+'.xlsx', (err) => {
+                // Delete xlsx
+                if(fs.existsSync(config.xlsxDir+deviceId+'.xlsx')){
+                    fs.unlink(config.xlsxDir+deviceId+'.xlsx', (err) => {
                         if (err) throw err;
                     });
                 }
-
                 return res.send({'message':lang.logoutSuccess})
             } catch (error) {
                 return res.status(500).send({'message': 'Internal Server Error.'})
