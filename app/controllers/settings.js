@@ -552,7 +552,7 @@ module.exports = function (app) {
         if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not do this action.`})
     
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})
-        if(user=await userModel.get({select: 'bin_to_uuid(uid) as uid,name,username,sex,phone,email,role,permissions,port,photo,banned,banned_reason,logined_at,logout_at,last_ip,last_user_agent,created_at,updated_at',filters: filters})){
+        if(user = await userModel.get({select: '*, bin_to_uuid(uid) as uid',filters: filters})){
             const data_json = generalLib.omit(user, 'password') 
             data_json.logined_at = generalLib.formatDateTime(data_json.logined_at)
             data_json.created_at = generalLib.formatDateTime(data_json.created_at)
