@@ -568,13 +568,11 @@ module.exports = function (app) {
                     action: 'edit', 
                     data: JSON.stringify(actData)
                 })
-                return res.status(201).send({'message': 'success'})
+                const status = updateUser.data.status
+                if(status == 422) return res.status(422).send({'message': updateUser.data.message})
+                if(status == 403) return res.status(403).send({'message': updateUser.data.message})
+                return res.send({'message': `${statusMsg} success`})
             } 
-
-            const status = updateUser.data.status
-            if(status == 422) return res.status(422).send({'message': updateUser.data.message})
-            if(status == 403) return res.status(403).send({'message': updateUser.data.message})
-            res.send({'message': 'updated success'})
         }
         return res.status(404).send({'message': 'User Not Found'})
     })
