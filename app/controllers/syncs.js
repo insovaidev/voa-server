@@ -18,6 +18,7 @@ const passportSyncModel = require('../models/passportSyncModel')
 const visaSyncModel = require('../models/visaSyncModel') 
 const printedVisasSyncModel = require('../models/printedVisasSyncModel')
 const deletedVisasSyncModel = require('../models/deletedVisasSyncModel');
+const generalLib = require('../libraries/generalLib');
 
 
 module.exports = function(app) {
