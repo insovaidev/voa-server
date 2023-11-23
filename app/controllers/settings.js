@@ -534,39 +534,91 @@ module.exports = function (app) {
     
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'params uuid invalid.'})
         if(user = await userModel.get({select: '*, bin_to_uuid(uid) as uid',filters: filters})){
-            const data_json = generalLib.omit(user, 'password') 
-            data_json.logined_at = generalLib.formatDateTime(data_json.logined_at)
-            data_json.created_at = generalLib.formatDateTime(data_json.created_at)
-            data_json.updated_at = generalLib.formatDateTime(data_json.updated_at)
-            data_json.logout_at = generalLib.formatDateTime(data_json.logout_at)
-            const device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
-            await activityLogModel.add({
-                id: generalLib.generateUUID(device.port),
-                uid: me.id, 
-                ip: generalLib.getIp(req), 
-                port: device.port,
-                record_id: req.params.id, 
-                device_id: deviceId,
-                ref_id: user.username,
-                record_type: 'users', 
-                action: 'edit', 
-                data: JSON.stringify(data_json)
-            })
-            const dataBanned = {}
-            let status = 'Banned'
-            if(body){
-                if(body.banned_reason && body.banned_reason.length) dataBanned.banned_reason = req.body.banned_reason 
-                if(body.banned && body.banned.length){
-                    dataBanned.banned = req.body.banned
-                    if(body.banned == 0) {
-                        status= 'Unbanned'
-                        dataBanned.banned_reason = null
-                    }
+
+            if(user = await userModel.get({select: '*, bin_to_uuid(uid) as uid',filters: filters})){
+                const dataBanned = {}
+                let statusMsg = 'Banned'
+                if(body){
+                    if(body.banned_reason && body.banned_reason.length) dataBanned.banned_reason = req.body.banned_reason 
+                    if(body.banned && body.banned.length){
+                        dataBanned.banned = req.body.banned
+                        if(body.banned == 0) {
+                            statusMsg= 'Unbanned'
+                            dataBanned.banned_reason = null
+                        }
+                    } 
+                }
+                const updateUser = await axios.post(config.centralUrl+`users/update/${req.params.id}`, dataBanned)
+                // Add activity 
+                if(updateUser && updateUser.data.data != undefined){
+                    const actData = updateUser.data.data
+                    actData.logined_at = generalLib.formatDateTime(actData.logined_at)
+                    actData.created_at = generalLib.formatDateTime(actData.created_at)
+                    actData.updated_at = generalLib.formatDateTime(actData.updated_at)
+                    actData.logout_at = generalLib.formatDateTime(actData.logout_at)
+                    const device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
+
+                    // await activityLogModel.add({
+                    //     id: generalLib.generateUUID(me.port),
+                    //     uid: me.id, 
+                    //     ip: generalLib.getIp(req), 
+                    //     port: device.port, 
+                    //     record_id: req.params.id,
+                    //     ref_id: actData.username,
+                    //     device_id: deviceId,
+                    //     record_type: 'users', 
+                    //     action: 'edit', 
+                    //     data: JSON.stringify(actData)
+                    // })
+
+
+                    return res.status(201).send({'message': 'success'})
                 } 
+
+                const status = updateUser.data.status
+                if(status == 422) return res.status(422).send({'message': updateUser.data.message})
+                if(status == 403) return res.status(403).send({'message': updateUser.data.message})
+                res.send({'message': 'updated success'})
+                
+
             }
             
-            await userModel.update(filters.uid, {...dataBanned }, 'uid')
-            return res.send({'message': `${status} success`})
+                
+
+
+            // const data_json = generalLib.omit(user, 'password') 
+            // data_json.logined_at = generalLib.formatDateTime(data_json.logined_at)
+            // data_json.created_at = generalLib.formatDateTime(data_json.created_at)
+            // data_json.updated_at = generalLib.formatDateTime(data_json.updated_at)
+            // data_json.logout_at = generalLib.formatDateTime(data_json.logout_at)
+            // const device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
+            // await activityLogModel.add({
+            //     id: generalLib.generateUUID(device.port),
+            //     uid: me.id, 
+            //     ip: generalLib.getIp(req), 
+            //     port: device.port,
+            //     record_id: req.params.id, 
+            //     device_id: deviceId,
+            //     ref_id: user.username,
+            //     record_type: 'users', 
+            //     action: 'edit', 
+            //     data: JSON.stringify(data_json)
+            // })
+            // const dataBanned = {}
+            // let status = 'Banned'
+            // if(body){
+            //     if(body.banned_reason && body.banned_reason.length) dataBanned.banned_reason = req.body.banned_reason 
+            //     if(body.banned && body.banned.length){
+            //         dataBanned.banned = req.body.banned
+            //         if(body.banned == 0) {
+            //             status= 'Unbanned'
+            //             dataBanned.banned_reason = null
+            //         }
+            //     } 
+            // }
+            
+            // await userModel.update(filters.uid, {...dataBanned }, 'uid')
+            // return res.send({'message': `${status} success`})
         }        
         return res.status(404).send({'message': 'User Not Found'})
     })
