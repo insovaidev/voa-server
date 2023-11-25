@@ -318,11 +318,11 @@ module.exports = function (app) {
             filters.not_role = ['super_admin', 'admin', 'sub_admin']
         }
 
-        if(limit = req.query.limit){
-            filters.limit = limit 
-        }  else {
-            filters.limit = 30    
-        }
+        // if(limit = req.query.limit){
+        //     filters.limit = limit 
+        // }  else {
+        //     filters.limit = 30    
+        // }
 
         if(offset = req.query.offset) {
             filters.offset = offset 
@@ -345,8 +345,7 @@ module.exports = function (app) {
         if(result=await userModel.total({filters:filters})){
             total = result[0].total
         }
-    
-        res.send({'total': total, 'limit': parseInt(filters.limit) , 'offset': parseInt(filters.offset),  'data': data.length > 0 ? data : null})
+        res.send({'total': total , 'offset': parseInt(filters.offset),  'data': data.length > 0 ? data : null})
     })
 
     // Update User Profile 
