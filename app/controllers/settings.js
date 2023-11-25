@@ -346,7 +346,7 @@ module.exports = function (app) {
             total = result[0].total
         }
     
-        res.send({'total': total, 'limit': 30 , 'offset': parseInt(filters.offset),  'data': data.length > 0 ? data : null})
+        res.send({'total': total, 'limit': parseInt(filters.limit) , 'offset': parseInt(filters.offset),  'data': data.length > 0 ? data : null})
     })
 
     // Update User Profile 
