@@ -107,7 +107,7 @@ module.exports = {
     
     filters: function(q, filters=null) {
         if(filters) {          
-            console.log(filters)   
+    
             if(filters.search_value) q.whereRaw(`username LIKE '%${filters.search_value}%'`)
             if(filters.username) q.where('username', filters.username)
             if(filters.uid) q.whereRaw('uid = uuid_to_bin('+"'"+filters.uid+"'"+')')
