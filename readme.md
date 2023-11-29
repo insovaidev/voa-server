@@ -27,3 +27,6 @@ WHERE role in ('report', 'staff', 'sub_admin');
 
 if(sub_admin) 
 WHERE (role = 'report' AND port IS NOT NULL) OR role = 'staff';
+
+
+## to update 

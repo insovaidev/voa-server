@@ -107,7 +107,6 @@ module.exports = {
     
     filters: function(q, filters=null) {
         if(filters) {          
-    
             if(filters.search_value) q.whereRaw(`username LIKE '%${filters.search_value}%'`)
             if(filters.username) q.where('username', filters.username)
             if(filters.uid) q.whereRaw('uid = uuid_to_bin('+"'"+filters.uid+"'"+')')
@@ -117,7 +116,6 @@ module.exports = {
             // when get histories
             if(filters.in_role) q.whereIn('role', filters.in_role)
             if(filters.role) q.where('role', filters.role)
-            if(filters.not_port && filters.not_port == 1) q.whereRaw('port IS NOT NULL')
 
             // filter for admin 
             if(filters.admin_has_port == 0){
