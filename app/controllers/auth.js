@@ -13,25 +13,23 @@ const portModel = require('../models/portModel')
 
 
 module.exports = function(app) {
-    app.post('/auth/login',
-        [check('username').notEmpty().trim().escape(),
-        check('password').notEmpty().isLength({min: 6}).trim().escape()],
-        async (req, res) => {
-            // Check Form Errors
-            const errors = validationResult(req)
-            if (!errors.isEmpty()) return res.status(422).json(generalLib.formErrors(errors.array()))
-            const body = req.body
-            const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null 
-            const device = await deviceModel.get({filters: {'device_id': deviceId}})
-            if(!device) return res.status(404).send({'message': 'device_id not found.'})  
-            if(device.status==0) return res.status(403).send({'message': lang.deviePending})
-            if(device.status==2) return res.status(403).send({'message': lang.deviceBanned})
-           
-            const select = 'bin_to_uuid(uid) as uid, name, username, password, phone, role, email, permissions, port, banned, phone, banned_reason, logout_at, logined_at, last_ip, created_at, updated_at'
+    
+    app.post('/auth/login', [ check('username').notEmpty().trim().escape(), check('password').notEmpty().isLength({min: 6}).trim().escape()], async (req, res) => {
+        // Check Form Errors
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) return res.status(422).json(generalLib.formErrors(errors.array()))
+        const body = req.body
+        const deviceId = req.headers['device-id'] != undefined && req.headers['device-id'] ? req.headers['device-id'] : null 
+        const device = await deviceModel.get({filters: {'device_id': deviceId}})
+        if(!device) return res.status(404).send({'message': 'device_id not found.'})  
+        if(device.status==0) return res.status(403).send({'message': lang.deviePending})
+        if(device.status==2) return res.status(403).send({'message': lang.deviceBanned})
+        
+        const select = 'bin_to_uuid(uid) as uid, name, username, password, phone, role, email, permissions, port, banned, phone, banned_reason, logout_at, logined_at, last_ip, created_at, updated_at'
 
+        try {
             // Check Login Attempt
             const attempts = await attemptModel.gets({select: 'created_at', filters: {'user': body.username}})
-           
             if(attempts && attempts.length > 4){
                 var nowToLastAtt = new Date() - attempts[0]['created_at'] // Time from last attempt till now.
                 var waitTime = generalLib.millisToMinutesAndSeconds(300000 - nowToLastAtt) 
@@ -111,7 +109,7 @@ module.exports = function(app) {
             actBody.action = "login"
             actBody.record_type = "users"
             if(user && user.port == null) actBody.port = device.port
-           
+            
             await activityLogModel.add(actBody)
             
             // Update last login
@@ -127,7 +125,10 @@ module.exports = function(app) {
             await deviceModel.update(deviceId, {'uid': user.uid}, 'device_id')
             
             // Reaspone data
-            return res.send({'data':data, 'tokens':tokens})       
+            return res.send({'data':data, 'tokens':tokens})
+        } catch (error) {
+            return res.status(422).send({'code': error.code , 'sql': error.sql, 'sqlMessage': error.sqlMessage})
+        }     
     })
 
     app.post('/auth/logout', async (req, res) => {

@@ -115,6 +115,8 @@ module.exports = {
         if(filters.search_type == 'all'){
             q.whereRaw("CONCAT(v.visa_no, v.sex, v.nationality)"+'like'+`%${filters.search_value}%`) 
         }
+
+
         // Return Result
         const result = await q
         return result && result.length ? result : null

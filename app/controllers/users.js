@@ -4,10 +4,6 @@ module.exports = function(app){
 
     app.post('/users/create', async (req, res) => {
         const body = req.body
-
-        if(exist = await userModel.get({select:'username', filters: { username: body.username }})) {
-            return res.status(200).send({'status': 422, 'message': 'username already exist.'})
-        } 
         const userData = {
             'uid': body.uid,
             'name': body.name,
@@ -27,31 +23,26 @@ module.exports = function(app){
             'last_ip':  body.last_ip,
             'last_user_agent':  body.last_user_agent,
         }
-        
         try {
-            await userModel.add(userData)
+            if(exist = await userModel.get({select:'username', filters: { 'username': body.username }})) return res.status(200).send({'status': 422, 'message': 'Username already exist.'})
+            const add = await userModel.add(userData)
             const user =  await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: {'uid': userData.uid }})
             return res.status(200).send({'data': user })
         } catch (error) {
-            // console.log(error)
+            return res.status(422).send({'code': error.code , 'sql': error.sql, 'sqlMessage': error.sqlMessage})
         }
-        return res.status(200).send({'status': 403, 'message': 'create user fail.'})
     })
 
     app.post('/users/update/:id', async (req, res) => {
         const id = req.params.id
-        const body = req.body
-        const userData = body  
-
+        const userData = req.body  
         try {
             if(await userModel.update(id, userData)){
                 const user =  await userModel.get({select: 'bin_to_uuid(uid) as uid,username, name, phone, sex, email, permissions, port, photo, banned, role, banned_reason, logined_at,logout_at,last_ip,	updated_at, created_at', filters: {'uid': id }})
                 return res.status(200).send({'data': user })
             }
-            return res.status(200).send({'status': 403, 'message': 'update user fail.'})
         } catch (error) {
-            // console.log(error)
+            return res.status(422).send({'code': error.code , 'sql': error.sql, 'sqlMessage': error.sqlMessage})
         }
-        return res.status(200).send({'status': 403, 'message': 'update user fail.'})
     })
 }
