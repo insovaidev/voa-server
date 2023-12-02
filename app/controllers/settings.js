@@ -425,46 +425,48 @@ module.exports = function (app) {
 
         if(!generalLib.uuidValidate(req.params.id)) return res.status(422).send({'message': 'Params uuid invalid.'})  
 
+
         // Not allowed update user    
         if(['report', 'staff'].includes(me.role)) return res.status(403).send({'message': `Role ${me.role} can not update a user.`})
 
-        // Super Admin
-        if(me.role == 'super_admin'){
-            if(!(['admin', 'report'].includes(result.role))) {
-                if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${result.role} port is required.`})
-            }
-            data.port = data.port ? data.port : null
-        }
-        // Admin
-        if(me.role=='admin'){
-            if(data.role && ['super_admin'].includes(data.role)) return res.send({'message': `As admin can not assign user to role super_admin.`})
-            // Admin no port
-            if(me.port==null){
-                if(!(['report'].includes(result.role))) {
-                    if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Admin has no port can only update Admin has port.`})
+        try {
+            const user = await userModel.get({select: 'username, port, role', filters: { uid: req.params.id}})
+            // Super Admin
+            if(me.role == 'super_admin'){
+                if(!(['admin', 'report'].includes(user.role))) {
+                    if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Update user that has role ${user.role} port is required.`})
                 }
                 data.port = data.port ? data.port : null
             }
-            // Admin has port
-            if(me.port) {
-                if(!data.port || data.port != me.port) return res.status(403).send({'message': `This Admin can only assign user to port ${me.port}.`})
+            // Admin
+            if(me.role=='admin'){
+                if(data.role && ['super_admin'].includes(data.role)) return res.send({'message': `As admin can not assign user to role super_admin.`})
+                // Admin no port
+                if(me.port==null){
+                    if(!(['report'].includes(user.role))) {
+                        if(!data.port || data.port.toUpperCase() =='NULL') return res.status(403).send({'message': `Admin has no port can only update Admin has port.`})
+                    }
+                    data.port = data.port ? data.port : null
+                }
+                // Admin has port
+                if(me.port) {
+                    if(!data.port || data.port != me.port) return res.status(403).send({'message': `This Admin can only assign user to port ${me.port}.`})
+                }
             }
-        }
-    
-        // Sub Admin
-        if(me.role=='sub_admin'){
-            if(data.role){
-                if(['super_admin', 'admin', 'sub_admin'].includes(data.role)) return res.status(403).send({'message': `As sub_admin can not assign user to role ${data.role}.`})
+        
+            // Sub Admin
+            if(me.role=='sub_admin'){
+                if(data.role){
+                    if(['super_admin', 'admin', 'sub_admin'].includes(data.role)) return res.status(403).send({'message': `As sub_admin can not assign user to role ${data.role}.`})
+                }
+                if(data.port && me.port!==data.port) return res.send({'message': `This user can only assign to port ${me.port}.`})
             }
-            if(data.port && me.port!==data.port) return res.send({'message': `This user can only assign to port ${me.port}.`})
-        }
-
-        try {
-            const user = await userModel.get({select: 'username, port, role', filters: { uid: req.params.id}})
+        
             if(!user) return res.status(403).send({'message':'User not found'})
-            if(data.username != result.username){
+            if(data.username && (data.username !== user.username)){
                 if(exist = await userModel.get({filters: {'username': data.username}})) return res.status(403).send({'message':'Username already exist'})
             }
+            
             if(data.password){
                 if(data.password != data.confirmPassword) return res.status(403).send({'message': 'comfirmPassword not match.'})
                 data.password = await passwordLib.hash(data.password)
