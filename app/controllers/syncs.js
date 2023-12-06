@@ -46,7 +46,7 @@ module.exports = function(app) {
                 }
                 sync_logs.users = sid
                 fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
-                res.send({'id': sid })
+                res.send({'sid': sid })
         } catch (error) {
             next()
             // res.status(201).send({'message': 'CONFUSE SERVER'})
@@ -139,7 +139,7 @@ module.exports = function(app) {
             }
             sync_logs.ports = sid
             fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
-            res.send({'id':sid})
+            res.send({'sid':sid})
         } catch (error) {
             next()
         }
@@ -179,7 +179,7 @@ module.exports = function(app) {
             }
             sync_logs.visa_types = sid
             fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
-            res.send({'id':sid})
+            res.send({'sid':sid})
                 
         } catch (error) {
             next() 
@@ -219,7 +219,7 @@ module.exports = function(app) {
             }
             sync_logs.countries = sid
             fs.writeFileSync('sync_logs', JSON.stringify(sync_logs))
-            res.send({'id':sid})   
+            res.send({'sid':sid})   
         } catch (error) {
             next()
         }        
