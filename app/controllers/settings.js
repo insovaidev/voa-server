@@ -389,13 +389,23 @@ module.exports = function (app) {
                     data_json.logout_at = generalLib.formatDateTime(data_json.logout_at)
                     const device = await deviceModel.get({select: 'port', filters: { 'device_id': deviceId }}) 
     
-                    // add user_sync record
-                    await userSyncModel.add({
-                        'id': user.uid,
-                        'status': 1,
-                        'created_at': generalLib.formatDateTime(user.created_at),
-                        'updated_at': generalLib.formatDateTime(user.updated_at),
-                    })
+                    const user_sync =  await userSyncModel.get({select: '*, bin_to_uuid(id) as id', filters: {'id': user.uid}})
+                    if(user_sync == null){
+                        await userSyncModel.add({
+                            'id': user.uid,
+                            'status': 1,
+                            'created_at': generalLib.formatDateTime(user.created_at),
+                            'updated_at': generalLib.formatDateTime(user.updated_at),
+                        })
+                    } else {
+                        await userSyncModel.delete({filters: {'id': user_sync.uid }})
+                        await userSyncModel.add({
+                            'id': user.uid,
+                            'status': 1,
+                            'created_at': generalLib.formatDateTime(user.created_at),
+                            'updated_at': generalLib.formatDateTime(user.updated_at),
+                        })
+                    }
     
                     await activityLogModel.add({
                         id: generalLib.generateUUID(me.port),
