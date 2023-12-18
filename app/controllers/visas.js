@@ -475,6 +475,9 @@ module.exports = function (app) {
             printFilters.port = me.port
             scannedFilters.port = me.port
         }
+        var deleteDate = {}
+        var printDate = {}
+        var scanDate = {}
         try {
             await Promise.all([
                 visaModel.total({filters: deleteFilters }).then(result => {
