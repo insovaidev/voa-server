@@ -475,9 +475,9 @@ module.exports = function (app) {
             printFilters.port = me.port
             scannedFilters.port = me.port
         }
-        var deleteDate = {}
-        var printDate = {}
-        var scanDate = {}
+        var delete_date = {}
+        var not_prined_date = {}
+        var not_attached_date = {}
         try {
             await Promise.all([
                 visaModel.total({filters: deleteFilters }).then(result => {
@@ -486,8 +486,8 @@ module.exports = function (app) {
 
                 visaModel.statisticsDate({filters: deleteFilters}).then(result => {
                     if(result && result.length){
-                        deleteDate.start_date = generalLib.formatDate(result[0].updated_at)
-                        deleteDate.end_date = generalLib.formatDate(result[result.length -1].updated_at)
+                        delete_date.start_date = generalLib.formatDate(result[0].updated_at)
+                        delete_date.end_date = generalLib.formatDate(result[result.length -1].updated_at)
                     } 
                 }),
                 
@@ -497,8 +497,8 @@ module.exports = function (app) {
 
                 visaModel.statisticsDate({filters: printFilters}).then(result => {
                     if(result && result.length){
-                        printDate.start_date = generalLib.formatDate(result[0].updated_at)
-                        printDate.end_date = generalLib.formatDate(result[result.length -1].updated_at)
+                        not_prined_date.start_date = generalLib.formatDate(result[0].updated_at)
+                        not_prined_date.end_date = generalLib.formatDate(result[result.length -1].updated_at)
                     } 
                 }),
     
@@ -508,12 +508,14 @@ module.exports = function (app) {
 
                 visaModel.statisticsDate({filters: scannedFilters}).then(result => {
                     if(result && result.length){
-                        scanDate.start_date = generalLib.formatDate(result[0].updated_at)
-                        scanDate.end_date = generalLib.formatDate(result[result.length -1].updated_at)
+                        not_attached_date.start_date = generalLib.formatDate(result[0].updated_at)
+                        not_attached_date.end_date = generalLib.formatDate(result[result.length -1].updated_at)
                     } 
                 }),
             ])
-            return res.send({ 'deleted': deleted, 'not_printed': not_printed, 'not_attached': not_attached ,'delete_date': deleteDate, 'scan_date': scanDate, 'printed_date': printDate})
+
+        
+            return res.send({ 'deleted': deleted, 'not_printed': not_printed, 'not_attached': not_attached ,'deleted_date': Object.keys(delete_date).length ? delete_date : null , 'not_scan_date': Object.keys(not_attached_date).length ? not_attached_date : null, 'not_print_date': Object.keys(not_prined_date).length ? not_prined_date : null})
         } catch (error) {
             return res.status(422).send({'code': error.code , 'sql': error.sql, 'message': error.sqlMessage})
         }
