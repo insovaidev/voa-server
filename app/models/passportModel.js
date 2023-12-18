@@ -77,7 +77,7 @@ module.exports = {
 
         this.filters(q, filters)
         
-        // Sort
+        // So
         q.limit(30)
         
         q.offset(filters && filters.offset != undefined ? filters.offset : 0)
@@ -168,7 +168,7 @@ module.exports = {
             if(filters.port) q.where('v.port', filters.port)
             if(filters.sex) q.where('p.sex', filters.sex)            
             if(filters.nationality) q.where('p.nationality', filters.nationality.toUpperCase())
-            
+            if(filters.travel_no) q.where('v.travel_no', filters.travel_no.toUpperCase())
         }
     },
 
