@@ -161,6 +161,29 @@ module.exports = {
         return result? data.id : null
     },
 
+    statisticsDate: async function({select=null, filters=null}={}) {
+
+        console.log(filters)
+
+
+        const q = db(table+' as v')
+
+        select = 'v.updated_at'
+
+        if(select || groupBy) q.select(db.raw(select ?? groupBy))
+
+
+        this.filters(q, filters)
+
+        q.join(db.raw('passports'+' as p on v.passport_id=p.passport_id')) 
+
+        q.orderBy('v.updated_at', 'asc')
+
+        const result = await q
+
+        return result && result.length ? result : null
+    },
+
     total: async function({select=null, groupBy=null, filters=null}={}) {
         const q = db(table+' as v')
 

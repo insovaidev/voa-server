@@ -477,16 +477,37 @@ module.exports = function (app) {
         }
         try {
             await Promise.all([
-                visaModel.total({ filters: deleteFilters }).then(result => {
+                visaModel.total({filters: deleteFilters }).then(result => {
                     if (result) deleted = result[0].total
                 }),
-    
+
+                visaModel.statisticsDate({filters: deleteFilters}).then(result => {
+                    if(result && result.length){
+                        deleteDate.start_date = generalLib.formatDate(result[0].updated_at)
+                        deleteDate.end_date = generalLib.formatDate(result[result.length -1].updated_at)
+                    } 
+                }),
+                
                 visaModel.total({ filters: printFilters }).then(result => {
                     if (result) not_printed = result[0].total
+                }),
+
+                visaModel.statisticsDate({filters: printFilters}).then(result => {
+                    if(result && result.length){
+                        printDate.start_date = generalLib.formatDate(result[0].updated_at)
+                        printDate.end_date = generalLib.formatDate(result[result.length -1].updated_at)
+                    } 
                 }),
     
                 visaModel.total({ filters: scannedFilters }).then(result => {
                     if (result) not_attached = result[0].total
+                }),
+
+                visaModel.statisticsDate({filters: scannedFilters}).then(result => {
+                    if(result && result.length){
+                        scanDate.start_date = generalLib.formatDate(result[0].updated_at)
+                        scanDate.end_date = generalLib.formatDate(result[result.length -1].updated_at)
+                    } 
                 }),
             ])
             return res.send({ 'deleted': deleted, 'not_printed': not_printed, 'not_attached': not_attached })
