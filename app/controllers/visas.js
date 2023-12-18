@@ -578,6 +578,11 @@ module.exports = function (app) {
                 })
             }
     
+
+            console.log(filters)
+
+
+            
             // List Passports
             if (lists) {
                 lists.forEach(val => {

@@ -79,6 +79,7 @@ module.exports = {
         
         // Sort
         q.limit(30)
+        
         q.offset(filters && filters.offset != undefined ? filters.offset : 0)
         if(filters.sort=='sex') {
             q.orderByRaw("CAST(p.sex AS CHAR)"+" "+filters.sort_value)

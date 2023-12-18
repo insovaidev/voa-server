@@ -162,10 +162,6 @@ module.exports = {
     },
 
     statisticsDate: async function({select=null, filters=null}={}) {
-
-        console.log(filters)
-
-
         const q = db(table+' as v')
 
         select = 'v.updated_at'
@@ -228,6 +224,7 @@ module.exports = {
             if(filters.printed) q.where('v.printed', filters.printed)
             if(filters.deleted) q.where('v.deleted', filters.deleted)
             if(filters.scanned) q.where('v.scanned', filters.scanned)
+            
         }
     }
 }
