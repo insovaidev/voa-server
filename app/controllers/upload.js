@@ -12,6 +12,9 @@ module.exports = function(app) {
     
     // handle file upload and save in tmp folder
     app.post('/upload', async (req, res) => {
+
+
+    
         const form = new formidable.IncomingForm()
         const [fields, files] = await form.parse(req)
         const me = req.me    
@@ -24,6 +27,8 @@ module.exports = function(app) {
                 
                 const name = (me.port+'-'+Date.now()+'-'+passwordLib.generate(12))+'.'+extension
                 const newFilePath = config.tmpDir+name
+
+                console.log(file.filepath)
 
                 // Move upload file to tmp
                     if(fileLib.copy(file.filepath, newFilePath, true)){
@@ -46,6 +51,7 @@ module.exports = function(app) {
 
                     }
                 } catch (error) {
+                    console.log(error)
                 return res.status(422).send({'message': error.message })
             }
         }
@@ -54,3 +60,4 @@ module.exports = function(app) {
     })
 
 }
+

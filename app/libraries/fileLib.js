@@ -5,10 +5,13 @@ const config = require('../config/config')
 module.exports = {
 
     copy: function(source, distrination, deleteSource=false) {
+        
+        console.log(source , distrination)
+
         this.createDir(distrination)
         if(fs.existsSync(source)) {
             if(deleteSource) {
-                fs.renameSync(source, distrination)
+                fs.copyFileSync(source, distrination)
             } else {
                 fs.copyFileSync(source, distrination)
             }
