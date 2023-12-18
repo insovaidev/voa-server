@@ -82,17 +82,6 @@ module.exports = {
         
         q.offset(filters && filters.offset != undefined ? filters.offset : 0)
 
-        // old code
-        // if(filters.sort=='sex') {
-        //     q.orderByRaw("CAST(p.sex AS CHAR)"+" "+filters.sort_value)
-        // } else {
-        //     q.orderBy(filters.sort && filters.sort != undefined ? 'p.'+filters.sort : 'p.created_at', filters.sort_value && filters.sort_value != undefined ? filters.sort_value : 'desc' )
-        // }
-     
-       
-        
-
-        // Sort
         if(filters.sort != undefined && filters.sort){
             if(['dob','passport_no','full_name'].includes(filters.sort)){ // passport fields
                 q.orderBy('p.'+filters.sort, filters.sort_value ? filters.sort_value : 'desc')

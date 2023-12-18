@@ -577,7 +577,7 @@ module.exports = function (app) {
                     countries[val.code] = val
                 })
             }
-            console.log(filters)
+      
             // List Applications
             if (lists) {
                 lists.forEach(val => {
