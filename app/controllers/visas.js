@@ -513,7 +513,7 @@ module.exports = function (app) {
                     } 
                 }),
             ])
-            return res.send({ 'deleted': deleted, 'not_printed': not_printed, 'not_attached': not_attached })
+            return res.send({ 'deleted': deleted, 'not_printed': not_printed, 'not_attached': not_attached ,'delete_date': deleteDate, 'scan_date': scanDate, 'printed_date': printDate})
         } catch (error) {
             return res.status(422).send({'code': error.code , 'sql': error.sql, 'message': error.sqlMessage})
         }
