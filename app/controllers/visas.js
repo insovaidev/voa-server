@@ -577,13 +577,8 @@ module.exports = function (app) {
                     countries[val.code] = val
                 })
             }
-    
-
             console.log(filters)
-
-
-            
-            // List Passports
+            // List Applications
             if (lists) {
                 lists.forEach(val => {
                     data.push({
