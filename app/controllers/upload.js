@@ -11,7 +11,7 @@ module.exports = function(app) {
     app.use('/upload', checkAuth)
     
     // handle file upload and save in tmp folder
-    app.post('/upload', async (req, res) => {
+    app.post('/upload', async (req, res) => {   
 
 
     
@@ -27,9 +27,6 @@ module.exports = function(app) {
                 
                 const name = (me.port+'-'+Date.now()+'-'+passwordLib.generate(12))+'.'+extension
                 const newFilePath = config.tmpDir+name
-
-                console.log(file.filepath)
-
                 // Move upload file to tmp
                     if(fileLib.copy(file.filepath, newFilePath, true)){
                         try {
@@ -51,7 +48,6 @@ module.exports = function(app) {
 
                     }
                 } catch (error) {
-                    console.log(error)
                 return res.status(422).send({'message': error.message })
             }
         }

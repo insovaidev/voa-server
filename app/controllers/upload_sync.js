@@ -22,10 +22,7 @@ module.exports = function(app) {
             } catch (error) {
                 next()
             }
-        }
-        
+        } 
         return res.status(200).send({'message': 'Nothing is update'})
-
     }) 
-
 }
