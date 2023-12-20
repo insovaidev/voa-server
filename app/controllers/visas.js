@@ -566,7 +566,7 @@ module.exports = function (app) {
                 filters.offset = 0
             }
             
-            var select = 'bin_to_uuid(p.pid) as pid,p.passport_no,p.expire_date as passport_expire_date,p.nationality,p.sex,p.full_name,p.created_at,p.updated_at, bin_to_uuid(v.vid) as vid, v.visa_no, v.base_id, v.visa_type,v.issued_date,v.expire_date,v.scanned,v.printed,v.deleted'
+            var select = 'bin_to_uuid(p.pid) as pid,p.passport_no,p.issued_date as p_issued_date, p.expire_date as p_expire_date, p.dob,p.nationality,p.sex,p.full_name,p.created_at as p_created_at,p.updated_at as p_updated_at, bin_to_uuid(v.vid) as vid, v.visa_no, v.visa_id, v.base_id, v.visa_type,v.issued_date,v.expire_date,v.scanned,v.printed,v.deleted, p.attachments as p_attachments'
     
             const lists = await passportModel.list({ select: select, filters: filters })
     
@@ -577,19 +577,33 @@ module.exports = function (app) {
                     countries[val.code] = val
                 })
             }
-      
-            // List Applications
+    
+            // List Passports
             if (lists) {
                 lists.forEach(val => {
+                    var passportAttachmentsData = null
+                    var passport_attachments = {}
+                    if(val.p_attachments && val.p_attachments != undefined) passportAttachmentsData = JSON.parse(val.p_attachments)
+                    if(passportAttachmentsData && passportAttachmentsData != undefined) {
+                        passport_attachments.photo = passportAttachmentsData.photo ? config.baseUrl + config.uploadDir + passportAttachmentsData.photo : null
+                        passport_attachments.passport = passportAttachmentsData.passport ? config.baseUrl + config.uploadDir + passportAttachmentsData.passport : null
+                    }
+
                     data.push({
                         'passport': {
                             'pid': val.pid,
+                            'dob': generalLib.formatDate(val.dob),
                             'passport_no': val.passport_no,
                             'full_name': val.full_name,
                             'sex': val.sex,
-                            'expire_date': generalLib.formatDate(val.passport_expire_date)
+                            'issued_date': val.passport_issued_date ? generalLib.formatDate(val.p_issued_date) : null,
+                            'expire_date': generalLib.formatDateTime(val.p_expire_date),
+                            'created_at': generalLib.formatDateTime(val.p_created_at),
+                            'updated_at': generalLib.formatDate(val.p_updated_at),
+                            'attachments': Object.keys(passport_attachments).length ? passport_attachments : null  
                         },
                         'vid': val.vid,
+                        'visa_id': val.visa_id,
                         'country': countries[val.nationality].name,
                         'country_code': countries[val.nationality].code,
                         'visa_no': val.visa_no,
@@ -599,7 +613,7 @@ module.exports = function (app) {
                         'printed': val.printed,
                         'deleted': val.deleted,
                         'issued_date': generalLib.formatDate(val.issued_date),
-                        'expire_date': generalLib.formatDate(val.expire_date)
+                        'expire_date': generalLib.formatDate(val.expire_date),
                     })
                 })
             }
@@ -613,6 +627,7 @@ module.exports = function (app) {
             return res.status(422).send({'code': error.code , 'sql': error.sql, 'message': error.sqlMessage})
         }
     })
+
 
     // Get a Visa
     app.get('/visas/:id', async (req, res) => {
