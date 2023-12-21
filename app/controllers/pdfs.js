@@ -74,10 +74,16 @@ module.exports = function (app) {
             }
                     
             // Launch the browser and open a new blank page
+            // const browser = await puppeteer.launch({
+            //     headless: 'new' , 
+            //     ignoreDefaultArgs: ['--disable-extensions'], // desible extention 
+            //     args: ['--enable-gpu'], // spead up when headless: true
+            // });
+
             const browser = await puppeteer.launch({
                 headless: 'new' , 
                 ignoreDefaultArgs: ['--disable-extensions'], // desible extention 
-                args: ['--enable-gpu'], // spead up when headless: true
+                args: ['--enable-gpu','--no-sandbox'], // spead up when headless: true
             });
 
             // Create a new page

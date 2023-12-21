@@ -135,6 +135,7 @@ module.exports = {
     },
 
     filters: function(q, filters=null) {
+        
         if(filters) {
             if(filters.issued_or_expire=='issued_date'){
                 if(filters.ie_start_date) q.where('p.issued_date', '>=', filters.ie_start_date)
